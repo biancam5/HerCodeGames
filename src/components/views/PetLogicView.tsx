@@ -640,7 +640,7 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
               </div>
             </div>
           </>
-        ) ) : activeLevel.number === 3 ? (
+        ) : activeLevel.number === 3 ? (
   <>
     {/* Level 3 — Program */}
     <div className="bg-white rounded-2xl p-3.5 border-2 border-purple-100 shadow-2xs flex items-start space-x-3">
