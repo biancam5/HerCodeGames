@@ -431,24 +431,23 @@ export const PetStage: React.FC<PetStageProps> = ({
                 >
                   {/* PUDDLE OBSTACLE ON PATH */}
                   {isPuddleTile && (
-                    <div className="absolute -top-7 flex flex-col items-center z-35 pointer-events-none">
+                    <div className="absolute -top-6 flex flex-col items-center z-35 pointer-events-none">
                       <StorybookPuddleSVG isNear={isPetHere} />
                     </div>
                   )}
 
                   {/* TARGET OBJECT: Storybook Illustrated Steak, Ball, or Home */}
-                  {isTargetObject && !isPuddleTile && (
-                    <div className="absolute -top-16 flex flex-col items-center z-35 pointer-events-none">
-                      <div className="animate-bowl-sparkle">
-                        {isHomeTile ? (
-                          <StorybookHomeGoalSVG isNear={isPetHere} />
-                        ) : isBallTarget ? (
-                          <StorybookTennisBallSVG isNear={isPetHere} />
-                        ) : (
-                          <StorybookSteakSVG isNear={isPetHere} />
-                        )}
-                      </div>
-                    </div>
+                               {isTargetObject && !isPuddleTile && !isHomeTile && (
+                <div className="absolute -top-16 flex flex-col items-center z-35 pointer-events-none">
+                  <div className="animate-bowl-sparkle">
+                    {isBallTarget ? (
+                      <StorybookTennisBallSVG isNear={isPetHere} />
+                    ) : (
+                      <StorybookSteakSVG isNear={isPetHere} />
+                    )}
+                  </div>
+                </div>
+               
                   )}
 
                   {/* OPTIONAL STAR BERRIES (For higher level collection) */}
@@ -1090,87 +1089,88 @@ const StorybookStarBerrySVG: React.FC<{ collected: boolean }> = ({ collected }) 
 // 11. Storybook Garden Puddle SVG
 const StorybookPuddleSVG: React.FC<{ isNear?: boolean }> = ({ isNear }) => (
   <div className="relative flex flex-col items-center select-none">
-    {/* Subtle water sparkle / ripple halo */}
     <div
-      className={`absolute -inset-1.5 rounded-full pointer-events-none transition-all duration-300 ${
-        isNear ? 'bg-cyan-300/50 blur-sm scale-110' : 'bg-cyan-200/20 blur-xs'
+      className={`absolute -inset-2 rounded-full pointer-events-none transition-all duration-300 ${
+        isNear ? 'bg-cyan-300/40 blur-md scale-110' : 'bg-cyan-200/20 blur-sm'
       }`}
     />
 
     <svg
-      width="78"
-      height="38"
-      viewBox="0 0 78 38"
+      width="98"
+      height="50"
+      viewBox="0 0 98 50"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className="drop-shadow-md overflow-visible"
     >
       <defs>
-        <radialGradient id="puddleWaterGrad" cx="45%" cy="40%" r="60%">
-          <stop offset="0%" stopColor="#E0F2FE" />
-          <stop offset="35%" stopColor="#7DD3FC" />
-          <stop offset="70%" stopColor="#38BDF8" />
-          <stop offset="95%" stopColor="#0284C7" />
+        <radialGradient id="puddleWaterGradNew" cx="45%" cy="40%" r="60%">
+          <stop offset="0%" stopColor="#ECFEFF" />
+          <stop offset="30%" stopColor="#A5F3FC" />
+          <stop offset="65%" stopColor="#38BDF8" />
           <stop offset="100%" stopColor="#0369A1" />
         </radialGradient>
-        <linearGradient id="puddleMudEdge" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#713F12" />
-          <stop offset="100%" stopColor="#451A03" />
+
+        <linearGradient id="puddleEdgeGradNew" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#7C4A1D" />
+          <stop offset="100%" stopColor="#4A2C12" />
         </linearGradient>
       </defs>
 
-      {/* Earth / Mud Border Rim */}
+      {/* Mud border */}
       <path
-        d="M 10 20 C 6 12, 22 4, 39 6 C 58 4, 74 12, 70 22 C 65 32, 48 35, 36 34 C 20 35, 12 30, 10 20 Z"
-        fill="url(#puddleMudEdge)"
-        opacity="0.75"
+        d="M 10 27 C 8 14, 25 6, 47 8 C 71 5, 90 15, 88 28 C 86 40, 66 45, 46 43 C 24 45, 10 39, 10 27 Z"
+        fill="url(#puddleEdgeGradNew)"
+        opacity="0.8"
       />
 
-      {/* Main Water Body */}
+      {/* Water */}
       <path
-        d="M 12 19 C 8 13, 23 7, 39 8 C 56 7, 71 13, 68 21 C 63 29, 47 32, 36 31 C 21 32, 14 27, 12 19 Z"
-        fill="url(#puddleWaterGrad)"
+        d="M 13 26 C 11 16, 27 10, 47 11 C 69 9, 85 17, 84 27 C 82 36, 64 40, 46 39 C 28 40, 14 35, 13 26 Z"
+        fill="url(#puddleWaterGradNew)"
         stroke="#38BDF8"
-        strokeWidth="1.2"
+        strokeWidth="1.6"
       />
 
-      {/* Gentle Water Ripple Rings */}
+      {/* Ripples */}
       <ellipse
-        cx="39"
-        cy="19"
-        rx="22"
-        ry="8"
+        cx="49"
+        cy="26"
+        rx="26"
+        ry="9"
         fill="none"
         stroke="#E0F2FE"
-        strokeWidth="1.2"
+        strokeWidth="1.4"
         opacity="0.85"
       />
       <ellipse
-        cx="37"
-        cy="20"
-        rx="13"
-        ry="5"
+        cx="48"
+        cy="27"
+        rx="16"
+        ry="5.5"
         fill="none"
         stroke="#BAE6FD"
-        strokeWidth="1"
-        opacity="0.7"
+        strokeWidth="1.1"
+        opacity="0.75"
       />
 
-      {/* Specular Sky Reflection Highlight */}
+      {/* Reflection */}
       <path
-        d="M 23 14 C 29 11, 46 11, 54 13"
+        d="M 31 18 C 37 15, 53 15, 62 18"
         stroke="#FFFFFF"
-        strokeWidth="1.8"
+        strokeWidth="2"
         strokeLinecap="round"
         fill="none"
         opacity="0.9"
       />
-      <circle cx="21" cy="16" r="1.5" fill="#FFFFFF" opacity="0.95" />
-      <circle cx="58" cy="15" r="1.2" fill="#FFFFFF" opacity="0.8" />
+      <ellipse cx="28" cy="22" rx="2.5" ry="1.6" fill="#FFFFFF" opacity="0.9" />
+      <ellipse cx="68" cy="21" rx="2" ry="1.3" fill="#FFFFFF" opacity="0.75" />
 
-      {/* Tiny Lily Leaf on Puddle Edge */}
-      <ellipse cx="60" cy="24" rx="4.5" ry="3" fill="#22C55E" stroke="#15803D" strokeWidth="0.8" />
-      <circle cx="59" cy="23.5" r="1" fill="#86EFAC" />
+      {/* Tiny grass details */}
+      <path d="M 17 34 Q 15 28 18 24" stroke="#16A34A" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M 20 34 Q 19 29 22 25" stroke="#22C55E" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M 79 35 Q 82 30 80 25" stroke="#16A34A" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M 76 35 Q 78 30 76 26" stroke="#22C55E" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   </div>
 );
