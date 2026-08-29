@@ -160,53 +160,86 @@ export const PET_LOGIC_LEVELS: PetLogicLevel[] = [
       conceptPill: 'Concept: Step Sequences',
     },
   },
-  {
-    id: 'logic-3',
-    number: 3,
-    title: 'Puddle Jump',
-    concept: 'Input & Output',
-    conceptKey: 'ordering',
-    story: "Manchu is ready to go home, but there's a puddle in the way! Help Manchu cross it safely.",
-    goal: 'Jump over the puddle and reach home.',
-    targetObjectType: 'puddle_home',
-    puddlePosition: 2,
-    homePosition: 4,
-    targetPosition: 4,
-    initialPetState: {
-      hunger: 100,
-      energy: 90,
-      cleanliness: 90,
-      happiness: 90,
-      position: 0,
-      starsCollected: 0,
-    },
-    idealSequenceLength: 4,
-    availableCommands: [
-      { id: 'cmd-move', type: 'MOVE', label: 'move()', iconName: 'Footprints', color: 'bg-rose-100 text-rose-700 border-rose-200', description: 'Step forward one space' },
-      { id: 'cmd-jump', type: 'JUMP', label: 'jump()', iconName: 'Zap', color: 'bg-amber-100 text-amber-700 border-amber-200', description: 'Jump over obstacle' },
-    ],
-    targetPetStateGoal: (finalState, commands) => {
-      const reachedHome = finalState.position >= 4;
-      const didJump = commands.includes('JUMP');
-
-      if (reachedHome && didJump) {
-        const stars = commands.length <= 4 ? 3 : 2;
-        return { success: true, stars, feedback: 'Awesome! Manchu jumped over the puddle and reached home safely!' };
-      }
-      if (!reachedHome) {
-        return { success: false, stars: 0, feedback: "Manchu hasn't reached home yet. Keep going!" };
-      }
-      if (!didJump) {
-        return { success: false, stars: 0, feedback: "Don't forget to jump over the puddle with jump()!" };
-      }
-      return { success: false, stars: 0, feedback: 'Cross the puddle with jump() and walk home!' };
-    },
-    explanationSuccess: {
-      title: 'Mission Complete!',
-      body: "You used a new command: jump(); Your input made something happen in the game — that's input and output!",
-      conceptPill: 'Concept: Input & Output',
-    },
+   {
+  id: 'logic-3',
+  number: 3,
+  title: 'Jump Over the Puddle',
+  concept: 'Programs & Algorithms',
+  conceptKey: 'ordering',
+  story: "A big puddle is blocking the path! Help Manchu jump over it and keep moving forward.",
+  goal: 'Jump over the puddle and reach the end of the path.',
+  targetObjectType: 'puddle_home',
+  puddlePosition: 2,
+  homePosition: 4,
+  targetPosition: 4,
+  initialPetState: {
+    hunger: 100,
+    energy: 90,
+    cleanliness: 90,
+    happiness: 90,
+    position: 0,
+    starsCollected: 0,
   },
+  idealSequenceLength: 3,
+  availableCommands: [
+    {
+      id: 'cmd-move',
+      type: 'MOVE',
+      label: 'move()',
+      iconName: 'Footprints',
+      color: 'bg-rose-100 text-rose-700 border-rose-200',
+      description: 'Step forward one space',
+    },
+    {
+      id: 'cmd-jump',
+      type: 'JUMP',
+      label: 'jump()',
+      iconName: 'Zap',
+      color: 'bg-amber-100 text-amber-700 border-amber-200',
+      description: 'Jump over obstacle',
+    },
+  ],
+  targetPetStateGoal: (finalState, commands) => {
+    const reachedEnd = finalState.position >= 4;
+    const didJump = commands.includes('JUMP');
+
+    if (reachedEnd && didJump) {
+      const stars = commands.length <= 3 ? 3 : 2;
+      return {
+        success: true,
+        stars,
+        feedback: 'Amazing! Manchu jumped over the puddle and reached the end of the path!',
+      };
+    }
+
+    if (!didJump) {
+      return {
+        success: false,
+        stars: 0,
+        feedback: 'Manchu needs to jump over the puddle. Try using jump()!',
+      };
+    }
+
+    if (!reachedEnd) {
+      return {
+        success: false,
+        stars: 0,
+        feedback: 'Great jump! Now help Manchu keep moving to the end of the path.',
+      };
+    }
+
+    return {
+      success: false,
+      stars: 0,
+      feedback: 'Try this sequence: move(), jump(), move().',
+    };
+  },
+  explanationSuccess: {
+    title: 'Mission Complete! 🎉',
+    body: 'You solved the problem with a step-by-step plan. That is how engineers think!',
+    conceptPill: 'Concept: Programs & Algorithms',
+  },
+},
   {
     id: 'logic-4',
     number: 4,
