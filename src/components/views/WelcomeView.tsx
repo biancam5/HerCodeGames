@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { PetType, PlayerProfile } from '../../types';
 import { PETS } from '../../data/levels';
 import { PetAvatar } from '../pet/PetAvatar';
-import { Sparkles, ArrowRight, Play, Compass, Users, Check, Wand2, AlertCircle } from 'lucide-react';
+import { Sparkles, ArrowRight, Play, Compass, Users, Check, Wand2, AlertCircle, Lock } from 'lucide-react';
 
 interface WelcomeViewProps {
   existingProfile: PlayerProfile | null;
@@ -23,10 +23,10 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
   onSelectProfile,
   onLaunchDemoMode,
 }) => {
-  const [selectedPet, setSelectedPet] = useState<PetType>('cat');
+  const [selectedPet, setSelectedPet] = useState<PetType>('dog');
   const [selectedPetMood, setSelectedPetMood] = useState<'happy' | 'eating' | 'sleeping' | 'playing'>('eating');
   const [playerName, setPlayerName] = useState<string>('');
-  const [petCustomName, setPetCustomName] = useState<string>(PETS['cat'].defaultName);
+  const [petCustomName, setPetCustomName] = useState<string>(PETS['dog'].defaultName);
   const [isCreatingNew, setIsCreatingNew] = useState<boolean>(!existingProfile);
   const [showSwitchModal, setShowSwitchModal] = useState<boolean>(false);
   const [nameError, setNameError] = useState<string | null>(null);
@@ -36,6 +36,8 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
   const petNameInputRef = useRef<HTMLInputElement>(null);
 
   const handlePetChange = (type: PetType) => {
+    if (type !== 'dog') return;
+
     setSelectedPet(type);
     setPetCustomName(PETS[type].defaultName);
     setSelectedPetMood('eating');
@@ -81,6 +83,13 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
     }
 
     if (hasError) return;
+
+    // MVP safety guard: only Manchu is playable in this version.
+    if (selectedPet !== 'dog') {
+      setSelectedPet('dog');
+      setPetCustomName(PETS['dog'].defaultName);
+      return;
+    }
 
     onStartAdventure(playerName.trim(), selectedPet, petCustomName.trim());
   };
@@ -283,34 +292,60 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
                 Choose your best friend:
               </label>
               <span className="text-[11px] text-pink-600 font-semibold">
-                Click any pet to meet them!
+                Manchu is available now
               </span>
+            </div>
+
+            <div className="mb-3 rounded-2xl bg-purple-50 border border-purple-200 px-4 py-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+                <Lock className="w-4 h-4 text-purple-700" />
+              </div>
+              <div>
+                <p className="text-sm font-black text-purple-950">
+                  More pet adventures are coming soon!
+                </p>
+                <p className="text-xs font-medium text-purple-700 mt-0.5">
+                  Manchu the Dalmatian is the only available character in this version.
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
               {(Object.keys(PETS) as PetType[]).map((type) => {
                 const pet = PETS[type];
+                const isAvailable = type === 'dog';
                 const isSelected = selectedPet === type;
+
                 return (
                   <button
                     key={type}
                     type="button"
                     id={`welcome-select-pet-${type}`}
+                    disabled={!isAvailable}
+                    aria-disabled={!isAvailable}
                     onClick={() => handlePetChange(type)}
-                    className={`relative p-2.5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between ${
-                      isSelected
-                        ? 'border-pink-500 bg-pink-50/95 shadow-md scale-104 ring-2 ring-pink-300'
-                        : 'border-gray-200 bg-white hover:bg-pink-50/40 hover:border-pink-200'
+                    className={`relative p-2.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-between overflow-hidden ${
+                      isAvailable
+                        ? isSelected
+                          ? 'border-pink-500 bg-pink-50/95 shadow-md scale-104 ring-2 ring-pink-300 cursor-pointer'
+                          : 'border-gray-200 bg-white hover:bg-pink-50/40 hover:border-pink-200 cursor-pointer'
+                        : 'border-slate-200 bg-slate-50 cursor-not-allowed'
                     }`}
                   >
-                    {/* Favorite Snack Pill (No coin) */}
+                    {/* Availability indicator */}
                     <div className="w-full flex justify-end">
-                      <span className="text-[11px] bg-white/90 border border-purple-100 rounded-full px-1.5 py-0.5 shadow-2xs font-bold text-purple-800">
-                        {pet.favoriteTreat.split(' ').pop()}
-                      </span>
+                      {isAvailable ? (
+                        <span className="text-[10px] bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 shadow-2xs font-black text-emerald-700 uppercase tracking-wide">
+                          Available
+                        </span>
+                      ) : (
+                        <span className="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center shadow-2xs">
+                          <Lock className="w-3.5 h-3.5" />
+                        </span>
+                      )}
                     </div>
 
-                    <div className="flex justify-center my-1">
+                    <div className={`flex justify-center my-1 ${!isAvailable ? 'opacity-70 grayscale-[20%]' : ''}`}>
                       <PetAvatar type={type} mood={isSelected ? 'happy' : 'idle'} size="sm" />
                     </div>
 
@@ -322,6 +357,15 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
                         {pet.species}
                       </p>
                     </div>
+
+                    {!isAvailable && (
+                      <div className="absolute inset-x-2 bottom-2 rounded-xl bg-slate-900/92 text-white py-1.5 px-2 flex items-center justify-center gap-1.5 shadow-md">
+                        <Lock className="w-3 h-3" />
+                        <span className="text-[9px] font-black uppercase tracking-wider">
+                          Coming Soon
+                        </span>
+                      </div>
+                    )}
                   </button>
                 );
               })}
