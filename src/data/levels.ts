@@ -1,4 +1,4 @@
-import { PetConfig, PetType, PetLogicLevel, CodePetLevel } from '../types';
+ import { PetConfig, PetType, PetLogicLevel, CodePetLevel } from '../types';
 
 export const PETS: Record<PetType, PetConfig> = {
   cat: {
@@ -248,6 +248,9 @@ export const PET_LOGIC_LEVELS: PetLogicLevel[] = [
     conceptKey: 'functions',
     story: 'Six crunchy dog biscuits are hidden around the garden! They appear one at a time in different places. Help Manchu move forward and backward to find every treat.',
     goal: 'Find and collect all 6 dog biscuits.',
+    targetObjectType: 'treat',
+    treatPositions: [4, 1, 3, 0, 2, 4],
+    totalTreats: 6,
     initialPetState: {
       hunger: 45,
       energy: 95,
@@ -255,8 +258,9 @@ export const PET_LOGIC_LEVELS: PetLogicLevel[] = [
       happiness: 70,
       position: 2,
       starsCollected: 0,
+      treatsCollected: 0,
     },
-    idealSequenceLength: 14,
+    idealSequenceLength: 20,
     availableCommands: [
       {
         id: 'cmd-move',
@@ -267,24 +271,24 @@ export const PET_LOGIC_LEVELS: PetLogicLevel[] = [
         description: 'Move one space to the right',
       },
       {
-        id: 'cmd-collect',
-        type: 'COLLECT',
+        id: 'cmd-collect-treat',
+        type: 'COLLECT_TREAT',
         label: 'collectTreat()',
         iconName: 'Cookie',
         color: 'bg-amber-100 text-amber-800 border-amber-200',
-        description: 'Collect the treat when Manchu reaches it',
+        description: 'Collect the biscuit when Manchu reaches it',
       },
     ],
     targetPetStateGoal: (finalState, commands) => {
-      const allTreats = finalState.starsCollected >= 6;
-      const collectedTreat = commands.includes('COLLECT');
+      const allTreats = (finalState.treatsCollected ?? 0) >= 6;
+      const collectedTreat = commands.includes('COLLECT_TREAT');
 
       if (allTreats && collectedTreat) {
-        const stars = commands.length <= 14 ? 3 : 2;
+        const stars = commands.length <= 20 ? 3 : 2;
         return {
           success: true,
           stars,
-          feedback: 'Amazing! Manchu found all 6 treats around the garden!',
+          feedback: 'Amazing! Manchu found all 6 biscuits around the garden!',
         };
       }
 
@@ -292,19 +296,19 @@ export const PET_LOGIC_LEVELS: PetLogicLevel[] = [
         return {
           success: false,
           stars: 0,
-          feedback: 'Move Manchu to the treat, then collect it with collectTreat().',
+          feedback: 'Find the biscuit, move Manchu to it, then collect it with collectTreat().',
         };
       }
 
       return {
         success: false,
         stars: 0,
-        feedback: `Keep searching! Manchu has collected ${Math.min(finalState.starsCollected, 6)} of 6 treats.`,
+        feedback: `Keep searching! Manchu has collected ${Math.min(finalState.treatsCollected ?? 0, 6)} of 6 treats.`,
       };
     },
     explanationSuccess: {
       title: 'Functions & Data Types! 🍪',
-      body: 'collectTreat() is a function: a named piece of code that performs a task. Programs also work with different data types, like different candy flavors: numbers, text, and true/false values.',
+      body: 'collectTreat() is a function: a reusable piece of code with one job. Programs also use different kinds of information, called data types.',
       conceptPill: 'Concepts: Functions & Data Types',
     },
   },
@@ -314,77 +318,65 @@ export const PET_LOGIC_LEVELS: PetLogicLevel[] = [
     title: 'Manchu’s Smart Dinner',
     concept: 'Conditions & if Statements',
     conceptKey: 'conditions',
-    story: 'Manchu is back from his treat hunt. Now the program has to check how hungry he is before deciding whether he should eat dinner.',
-    goal: 'Use an if condition to check Manchu’s hunger and feed him only when he is hungry.',
+    story: 'Now Manchu’s program has to make smart decisions! Look at his hunger number and choose the rule that should run.',
+    goal: 'Make 3 correct decisions by checking whether Manchu’s hunger is above 50 or 50 and below.',
+    targetObjectType: 'food_bowl',
     foodBowlPosition: 3,
     targetPosition: 3,
+    decisionHungerValues: [80, 30, 65],
+    requiredCorrectDecisions: 3,
     initialPetState: {
-      hunger: 75,
-      energy: 75,
-      cleanliness: 80,
+      hunger: 80,
+      energy: 80,
+      cleanliness: 85,
       happiness: 80,
-      position: 0,
+      position: 2,
       starsCollected: 0,
+      correctDecisions: 0,
+      decisionIndex: 0,
     },
-    idealSequenceLength: 4,
+    idealSequenceLength: 3,
     availableCommands: [
-      {
-        id: 'cmd-move',
-        type: 'MOVE',
-        label: 'move()',
-        iconName: 'Footprints',
-        color: 'bg-rose-100 text-rose-700 border-rose-200',
-        description: 'Move toward the dinner bowl',
-      },
       {
         id: 'cmd-if-hungry',
         type: 'IF_HUNGRY',
-        label: 'if (hunger > 50) { eat(); }',
+        label: 'IF hunger > 50 → EAT',
         iconName: 'HelpCircle',
+        color: 'bg-rose-100 text-rose-700 border-rose-200',
+        description: 'Eat when hunger is above 50',
+      },
+      {
+        id: 'cmd-if-not-hungry',
+        type: 'IF_NOT_HUNGRY',
+        label: 'IF hunger ≤ 50 → WAIT',
+        iconName: 'Pause',
         color: 'bg-purple-100 text-purple-700 border-purple-200',
-        description: 'Check hunger before eating',
+        description: 'Wait when hunger is 50 or less',
       },
     ],
     targetPetStateGoal: (finalState, commands) => {
-      const reachedBowl = finalState.position >= 3;
-      const usedCondition = commands.includes('IF_HUNGRY');
-      const hungerLow = finalState.hunger <= 25;
+      const required = 3;
+      const solved = (finalState.correctDecisions ?? 0) >= required;
 
-      if (reachedBowl && usedCondition && hungerLow) {
-        const stars = commands.length <= 4 ? 3 : 2;
+      if (solved) {
+        const stars = commands.length <= 3 ? 3 : 2;
         return {
           success: true,
           stars,
-          feedback: 'Perfect! Your program checked Manchu’s hunger and made a smart decision.',
-        };
-      }
-
-      if (!reachedBowl) {
-        return {
-          success: false,
-          stars: 0,
-          feedback: 'First help Manchu reach his dinner bowl.',
-        };
-      }
-
-      if (!usedCondition) {
-        return {
-          success: false,
-          stars: 0,
-          feedback: 'This level needs a decision. Check Manchu’s hunger with an if condition before feeding him.',
+          feedback: 'Perfect! You helped Manchu’s program make 3 smart decisions!',
         };
       }
 
       return {
         success: false,
         stars: 0,
-        feedback: 'Check the condition and make sure Manchu eats only when hunger is greater than 50.',
+        feedback: `Keep checking the hunger number. You have ${finalState.correctDecisions ?? 0} of ${required} correct decisions.`,
       };
     },
     explanationSuccess: {
       title: 'Smart Decisions with if! ⚡',
       body: 'A condition is a rule the computer checks. An if statement runs an action only when that condition is true.',
-      conceptPill: 'Concepts: Condition & if',
+      conceptPill: 'Concepts: Conditions & if',
     },
   },
 ];
