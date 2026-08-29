@@ -470,10 +470,16 @@ const DalmatianDogSVG: React.FC<{ mood: string }> = ({ mood }) => {
       {/* Dog-like Mouth with cute short tongue */}
       {isEating ? (
         <g>
-          <line x1="50" y1="53.5" x2="50" y2="55.5" stroke="#0F172A" strokeWidth="1.6" strokeLinecap="round" />
-          <path d="M 44 55.5 Q 47 57.5 50 56 Q 53 57.5 56 55.5" stroke="#0F172A" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-          <ellipse cx="50" cy="57" rx="3.5" ry="2.5" fill="#BE123C" />
-          <path d="M 47.5 57 Q 50 60.5 52.5 57 Z" fill="#FB7185" />
+          {/* Same mouth/tongue as Cute mode */}
+          <line x1="50" y1="53.5" x2="50" y2="56" stroke="#0F172A" strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M 43 55 Q 46.5 57.5 50 56 Q 53.5 57.5 57 55" stroke="#0F172A" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+          <path
+            d="M 47.5 56.5 C 47.5 56.5, 47 59.5, 48.5 60.5 C 49.3 61.2, 50.7 61.2, 51.5 60.5 C 53 59.5, 52.5 56.5, 52.5 56.5 Z"
+            fill="#FB7185"
+            stroke="#E11D48"
+            strokeWidth="0.6"
+          />
+          <line x1="50" y1="57" x2="50" y2="59.8" stroke="#BE123C" strokeWidth="0.5" strokeLinecap="round" />
         </g>
       ) : isHappy ? (
         <g>
@@ -597,8 +603,27 @@ const DalmatianDogSVG: React.FC<{ mood: string }> = ({ mood }) => {
         </g>
       )}
 
-      {/* Eating mode no longer renders a steak in Manchu's paws.
-          Eating is communicated through the face/mouth animation only. */}
+      {/* EATING MODE: full dog-food bowl next to Manchu */}
+      {isEating && (
+        <g>
+          <ellipse cx="78" cy="80" rx="11" ry="3.2" fill="#000000" opacity="0.08" />
+          <path
+            d="M68 73 C69 83, 87 83, 88 73 L84 82 C82 85, 74 85, 72 82 Z"
+            fill="#EF4444"
+            stroke="#BE123C"
+            strokeWidth="1.2"
+          />
+          <ellipse cx="78" cy="73" rx="11" ry="4.2" fill="#F87171" stroke="#BE123C" strokeWidth="1.2" />
+          <ellipse cx="78" cy="72.5" rx="8" ry="2.8" fill="#7C3F00" />
+          <circle cx="74.5" cy="72.2" r="1.1" fill="#A16207" />
+          <circle cx="78" cy="71.8" r="1.2" fill="#92400E" />
+          <circle cx="81.5" cy="72.4" r="1.1" fill="#A16207" />
+          <circle cx="76.4" cy="73.2" r="0.9" fill="#92400E" />
+          <circle cx="80.2" cy="73.1" r="0.9" fill="#78350F" />
+        </g>
+      )}
+
+      {/* Sleeping mode bed front */}
       {isSleeping && (
         /* Front bolster of dog bed with bone badge */
         <g>
