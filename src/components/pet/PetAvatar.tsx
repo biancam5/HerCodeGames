@@ -1,4 +1,4 @@
-import React from 'react';
+ import React from 'react';
 import { PetType } from '../../types';
 
 interface PetAvatarProps {
@@ -538,24 +538,68 @@ const DalmatianDogSVG: React.FC<{ mood: string }> = ({ mood }) => {
         />
       </g>
 
-      {/* EATING MODE: Paws Holding a Juicy Steak Meat 🥩 */}
-      {isEating ? (
+      {/* FRONT LEGS: keep Manchu's dog legs visible in every awake mood */}
+      {!isSleeping && (
         <g>
-          {/* Steak */}
+          {/* Left front leg — slimmer, longer and more dog-like */}
           <path
-            d="M36 68 C36 62, 56 60, 64 66 C68 70, 62 76, 52 75 C42 75, 36 74, 36 68 Z"
-            fill="#E11D48"
-            stroke="#9F1239"
+            d="M 34 66
+               C 33 72, 33 79, 33 86
+               C 33 90, 35 92, 38 92
+               C 41 92, 43 90, 43 86
+               C 43 79, 43 72, 42 66 Z"
+            fill="#FFFFFF"
+            stroke="#CBD5E1"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+
+          {/* Left paw */}
+          <path
+            d="M 33 88
+               C 34 85, 41 85, 43 88
+               C 45 91, 43 95, 38 95
+               C 33 95, 31 92, 33 88 Z"
+            fill="#FFFFFF"
+            stroke="#CBD5E1"
             strokeWidth="1.2"
           />
-          <ellipse cx="45" cy="67" rx="3.5" ry="2.5" fill="#FFE4E6" stroke="#9F1239" strokeWidth="0.8" />
-          <circle cx="45" cy="67" r="1.2" fill="#E11D48" />
+          <path d="M36 91 L36 94" stroke="#94A3B8" strokeWidth="0.9" strokeLinecap="round" />
+          <path d="M40 91 L40 94" stroke="#94A3B8" strokeWidth="0.9" strokeLinecap="round" />
+          <circle cx="36" cy="77" r="2.1" fill="#1E293B" />
 
-          {/* Paws holding steak */}
-          <ellipse cx="38" cy="72" rx="5.5" ry="4" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.2" />
-          <ellipse cx="60" cy="71" rx="5.5" ry="4" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.2" />
+          {/* Right front leg — slimmer, longer and more dog-like */}
+          <path
+            d="M 58 66
+               C 57 72, 57 79, 57 86
+               C 57 90, 59 92, 62 92
+               C 65 92, 67 90, 67 86
+               C 67 79, 67 72, 66 66 Z"
+            fill="#FFFFFF"
+            stroke="#CBD5E1"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+
+          {/* Right paw */}
+          <path
+            d="M 57 88
+               C 58 85, 65 85, 67 88
+               C 69 91, 67 95, 62 95
+               C 57 95, 55 92, 57 88 Z"
+            fill="#FFFFFF"
+            stroke="#CBD5E1"
+            strokeWidth="1.2"
+          />
+          <path d="M60 91 L60 94" stroke="#94A3B8" strokeWidth="0.9" strokeLinecap="round" />
+          <path d="M64 91 L64 94" stroke="#94A3B8" strokeWidth="0.9" strokeLinecap="round" />
+          <circle cx="64" cy="79" r="1.8" fill="#1E293B" />
         </g>
-      ) : isSleeping ? (
+      )}
+
+      {/* Eating mode no longer renders a steak in Manchu's paws.
+          Eating is communicated through the face/mouth animation only. */}
+      {isSleeping && (
         /* Front bolster of dog bed with bone badge */
         <g>
           <path
@@ -564,38 +608,12 @@ const DalmatianDogSVG: React.FC<{ mood: string }> = ({ mood }) => {
             stroke="#BE123C"
             strokeWidth="1.5"
           />
-          <path d="M46 85 C45 84, 45 87, 46 86 L54 86 C55 87, 55 84, 54 85 Z" fill="#FFFFFF" stroke="#BE123C" strokeWidth="0.8" />
-        </g>
-      ) : (
-        /* Front Legs & Paws visibly extending underneath the body */
-        <g>
-          {/* Left Front Leg Column */}
           <path
-            d="M 33 67 L 31 87 C 31 92, 33 95, 38 95 C 44 95, 45 92, 45 87 L 44 67 Z"
+            d="M46 85 C45 84, 45 87, 46 86 L54 86 C55 87, 55 84, 54 85 Z"
             fill="#FFFFFF"
-            stroke="#CBD5E1"
-            strokeWidth="1.3"
-            strokeLinejoin="round"
+            stroke="#BE123C"
+            strokeWidth="0.8"
           />
-          {/* Left Front Paw with Toes */}
-          <ellipse cx="38" cy="92.5" rx="6.8" ry="4.2" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.3" />
-          <line x1="36" y1="91" x2="36" y2="95" stroke="#94A3B8" strokeWidth="1" strokeLinecap="round" />
-          <line x1="40.5" y1="91" x2="40.5" y2="95" stroke="#94A3B8" strokeWidth="1" strokeLinecap="round" />
-          <circle cx="35" cy="78" r="2.2" fill="#1E293B" />
-
-          {/* Right Front Leg Column */}
-          <path
-            d="M 56 67 L 55 87 C 55 92, 56 95, 62 95 C 67 95, 69 92, 69 87 L 67 67 Z"
-            fill="#FFFFFF"
-            stroke="#CBD5E1"
-            strokeWidth="1.3"
-            strokeLinejoin="round"
-          />
-          {/* Right Front Paw with Toes */}
-          <ellipse cx="62" cy="92.5" rx="6.8" ry="4.2" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.3" />
-          <line x1="60" y1="91" x2="60" y2="95" stroke="#94A3B8" strokeWidth="1" strokeLinecap="round" />
-          <line x1="64.5" y1="91" x2="64.5" y2="95" stroke="#94A3B8" strokeWidth="1" strokeLinecap="round" />
-          <circle cx="64" cy="80" r="1.8" fill="#1E293B" />
         </g>
       )}
     </svg>
