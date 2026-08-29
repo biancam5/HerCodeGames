@@ -173,7 +173,7 @@ export const PET_LOGIC_LEVELS: PetLogicLevel[] = [
     homePosition: 4,
     targetPosition: 4,
     initialPetState: {
-      hunger: 0,
+      hunger: 100,
       energy: 90,
       cleanliness: 90,
       happiness: 90,
