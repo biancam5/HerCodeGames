@@ -181,18 +181,6 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
             </div>
           </div>
 
-          {/* Hackathon Demo Quick Access */}
-          <div className="mt-6 pt-4 border-t border-purple-100">
-            <button
-              id="welcome-judge-demo-btn"
-              onClick={onLaunchDemoMode}
-              className="inline-flex items-center space-x-1.5 text-xs font-bold text-purple-700 hover:text-purple-900 bg-purple-100/70 hover:bg-purple-100 px-3.5 py-1.5 rounded-full transition-all"
-            >
-              <Wand2 className="w-3.5 h-3.5 text-purple-600" />
-              <span>Hackathon Judge Demo Mode (1-Click Instant Emma Preset)</span>
-            </button>
-          </div>
-        </div>
 
         {/* Switch Player Modal */}
         {showSwitchModal && (
