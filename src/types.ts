@@ -22,6 +22,9 @@ export interface PetState {
   happiness: number; // 0 - 100
   position: number; // 0 to 4
   starsCollected: number;
+  treatsCollected?: number;
+  correctDecisions?: number;
+  decisionIndex?: number;
   currentAction?: string | null;
   mood?: 'happy' | 'hungry' | 'sleeping' | 'celebrating' | 'bathing' | 'playing' | 'eating' | 'thinking' | 'idle' | 'confused';
 }
@@ -47,6 +50,7 @@ export interface LearnerProfile {
     loops: 'not_started' | 'learning' | 'mastered';
     combined_logic: 'not_started' | 'learning' | 'mastered';
     variables: 'not_started' | 'learning' | 'mastered';
+    data_types: 'not_started' | 'learning' | 'mastered';
     if_statements: 'not_started' | 'learning' | 'mastered';
     js_loops: 'not_started' | 'learning' | 'mastered';
     functions: 'not_started' | 'learning' | 'mastered';
@@ -81,13 +85,16 @@ export interface PlayerProfile {
 
 export type CommandType =
   | 'MOVE'
+  | 'MOVE_BACK'
   | 'JUMP'
   | 'EAT'
   | 'PLAY'
   | 'BATH'
   | 'SLEEP'
   | 'COLLECT'
+  | 'COLLECT_TREAT'
   | 'IF_HUNGRY'
+  | 'IF_NOT_HUNGRY'
   | 'REPEAT_3';
 
 export interface CommandBlock {
@@ -118,10 +125,22 @@ export interface PetLogicLevel {
   foodBowlPosition?: number;
   puddlePosition?: number;
   homePosition?: number;
-  targetObjectType?: 'steak' | 'ball' | 'star' | 'puddle_home' | 'home';
+  targetObjectType?: 'steak' | 'ball' | 'star' | 'puddle_home' | 'home' | 'treat' | 'food_bowl';
   targetPosition?: number;
+
+  // Level 4: Treat Hunt
+  treatPositions?: number[];
+  totalTreats?: number;
+
+  // Level 5: Smart Decisions
+  decisionHungerValues?: number[];
+  requiredCorrectDecisions?: number;
+
   initialPetState: PetState;
-  targetPetStateGoal: (finalState: PetState, commands: CommandType[]) => { success: boolean; stars: number; feedback: string };
+  targetPetStateGoal: (
+    finalState: PetState,
+    commands: CommandType[]
+  ) => { success: boolean; stars: number; feedback: string };
   availableCommands: CommandBlock[];
   idealSequenceLength: number;
   explanationSuccess: {
@@ -227,3 +246,4 @@ export interface EvaluationResult {
     latencyMs: number;
   };
 }
+
