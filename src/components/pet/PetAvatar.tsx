@@ -435,8 +435,7 @@ const DalmatianDogSVG: React.FC<{ mood: string }> = ({ mood }) => {
       <circle cx="34" cy="28" r="2.5" fill="#1E293B" />
       <circle cx="65" cy="27" r="2.8" fill="#1E293B" />
 
-      {/* Snout */}
-      <ellipse cx="50" cy="53" rx="16" ry="11.5" fill="#F8FAFC" stroke="#E2E8F0" strokeWidth="1" />
+      
 
       {/* Rosy Cheeks */}
       <ellipse cx="32" cy="53" rx="4.5" ry="3" fill="#FDA4AF" opacity="0.7" />
