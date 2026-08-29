@@ -20,8 +20,10 @@ interface PetStageProps {
   foodBowlPosition?: number;
   puddlePosition?: number;
   homePosition?: number;
-  targetObjectType?: 'steak' | 'ball' | 'star' | 'puddle_home' | 'home';
+  targetObjectType?: 'steak' | 'ball' | 'star' | 'puddle_home' | 'home' | 'treat' | 'food_bowl';
   targetPosition?: number;
+  currentTreatPosition?: number;
+  totalTreats?: number;
   highlightTile?: number;
   totalTiles?: number;
   showMeters?: boolean;
@@ -31,6 +33,7 @@ interface PetStageProps {
   onManualEat?: () => void;
   onManualPlay?: () => void;
   onManualJump?: () => void;
+  onManualCollectTreat?: () => void;
   interactiveGameMode?: boolean;
 }
 
@@ -43,6 +46,8 @@ export const PetStage: React.FC<PetStageProps> = ({
   homePosition,
   targetObjectType = 'steak',
   targetPosition,
+  currentTreatPosition,
+  totalTreats = 6,
   highlightTile,
   totalTiles = 5,
   showMeters = true,
@@ -52,6 +57,7 @@ export const PetStage: React.FC<PetStageProps> = ({
   onManualEat,
   onManualPlay,
   onManualJump,
+  onManualCollectTreat,
   interactiveGameMode = true,
 }) => {
   const [internalState, setInternalState] = useState<PetState>(externalPetState);
@@ -67,7 +73,14 @@ export const PetStage: React.FC<PetStageProps> = ({
   }, [externalPetState]);
 
   const activeState = externalPetState || internalState;
-  const effectiveTargetPos = targetPosition !== undefined ? targetPosition : foodBowlPosition;
+  const isTreatTarget = targetObjectType === 'treat';
+  const isFoodBowlTarget = targetObjectType === 'food_bowl';
+  const effectiveTargetPos =
+    isTreatTarget && currentTreatPosition !== undefined
+      ? currentTreatPosition
+      : targetPosition !== undefined
+      ? targetPosition
+      : foodBowlPosition;
   const isBallTarget = targetObjectType === 'ball';
   const isPuddleMission = puddlePosition !== undefined || targetObjectType === 'puddle_home';
 
@@ -150,7 +163,21 @@ export const PetStage: React.FC<PetStageProps> = ({
   }, [onManualJump, puddlePosition, totalTiles]);
 
   const handleEatOrInteract = useCallback(() => {
-    const isAtTarget = activeState.position >= effectiveTargetPos;
+    const isAtTarget = isTreatTarget
+      ? activeState.position === effectiveTargetPos
+      : activeState.position >= effectiveTargetPos;
+
+    if (isTreatTarget) {
+      if (isAtTarget) {
+        if (onManualCollectTreat) {
+          onManualCollectTreat();
+        }
+        showReaction('Crunch! Treat collected! 🍪', 'yummy');
+      } else {
+        showReaction('Find the biscuit first! Look around the garden. 🐾', 'confused');
+      }
+      return;
+    }
 
     if (isAtTarget) {
       if (isBallTarget) {
@@ -187,7 +214,7 @@ export const PetStage: React.FC<PetStageProps> = ({
             setInternalState((p) => ({ ...p, currentAction: undefined, mood: 'happy' }));
           }, 900);
         }
-        showReaction('Yummy breakfast! 😋', 'yummy');
+        showReaction(isFoodBowlTarget ? 'Dinner time! So much kibble! 😋' : 'Yummy breakfast! 😋', 'yummy');
       }
     } else {
       if (isBallTarget) {
@@ -217,10 +244,19 @@ export const PetStage: React.FC<PetStageProps> = ({
             setInternalState((p) => ({ ...p, currentAction: undefined, mood: 'happy' }));
           }, 800);
         }
-        showReaction("There's no food here yet! 🐾", 'confused');
+        showReaction(isFoodBowlTarget ? 'Reach the dinner bowl first! 🐾' : "There's no food here yet! 🐾", 'confused');
       }
     }
-  }, [activeState.position, effectiveTargetPos, isBallTarget, onManualEat, onManualPlay]);
+  }, [
+    activeState.position,
+    effectiveTargetPos,
+    isBallTarget,
+    isFoodBowlTarget,
+    isTreatTarget,
+    onManualCollectTreat,
+    onManualEat,
+    onManualPlay,
+  ]);
 
   // Keyboard controls listener
   useEffect(() => {
@@ -294,6 +330,12 @@ export const PetStage: React.FC<PetStageProps> = ({
             <h2 className="font-['Outfit'] font-black text-base sm:text-lg text-slate-900 leading-tight">
               {displayTitle}
             </h2>
+            {isTreatTarget && (
+              <div className="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-[10px] font-black text-amber-800">
+                <span>🍪 Treats</span>
+                <span>{Math.min(activeState.treatsCollected ?? activeState.starsCollected, totalTreats)}/{totalTreats}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -435,19 +477,21 @@ export const PetStage: React.FC<PetStageProps> = ({
                       <StorybookPuddleSVG isNear={isPetHere} />
                     </div>
                   )}
-
-                  {/* TARGET OBJECT: Storybook Illustrated Steak, Ball, or Home */}
-                               {isTargetObject && !isPuddleTile && !isHomeTile && (
-                <div className="absolute -top-16 flex flex-col items-center z-35 pointer-events-none">
-                  <div className="animate-bowl-sparkle">
-                    {isBallTarget ? (
-                      <StorybookTennisBallSVG isNear={isPetHere} />
-                    ) : (
-                      <StorybookSteakSVG isNear={isPetHere} />
-                    )}
-                  </div>
-                </div>
-               
+                  {/* TARGET OBJECT */}
+                  {isTargetObject && !isPuddleTile && !isHomeTile && (
+                    <div className="absolute -top-16 flex flex-col items-center z-35 pointer-events-none">
+                      <div className="animate-bowl-sparkle">
+                        {isTreatTarget ? (
+                          <StorybookDogBiscuitSVG isNear={isPetHere} />
+                        ) : isFoodBowlTarget ? (
+                          <StorybookFullDogBowlSVG isNear={isPetHere} />
+                        ) : isBallTarget ? (
+                          <StorybookTennisBallSVG isNear={isPetHere} />
+                        ) : (
+                          <StorybookSteakSVG isNear={isPetHere} />
+                        )}
+                      </div>
+                    </div>
                   )}
 
                   {/* OPTIONAL STAR BERRIES (For higher level collection) */}
@@ -630,14 +674,24 @@ export const PetStage: React.FC<PetStageProps> = ({
                 <CornerDownLeft className="w-3.5 h-3.5 text-white" />
                 <div className="flex flex-col text-left leading-tight">
                   <span>
-                    {activeState.position >= effectiveTargetPos
+                    {isTreatTarget
+                      ? activeState.position === effectiveTargetPos
+                        ? 'Collect 🍪'
+                        : 'Search ⏎'
+                      : activeState.position >= effectiveTargetPos
                       ? isBallTarget
                         ? 'Play 🎾'
+                        : isFoodBowlTarget
+                        ? 'Eat Dinner 🥣'
                         : 'Eat 🥩'
                       : 'Action ⏎'}
                   </span>
                   <span className="text-[9px] font-mono text-pink-100 font-normal">
-                    {activeState.position >= effectiveTargetPos
+                    {isTreatTarget
+                      ? activeState.position === effectiveTargetPos
+                        ? 'collectTreat()'
+                        : 'action()'
+                      : activeState.position >= effectiveTargetPos
                       ? isBallTarget
                         ? 'play()'
                         : 'eat()'
@@ -969,6 +1023,128 @@ const StorybookTennisBallSVG: React.FC<{ isNear: boolean }> = ({ isNear }) => (
         opacity="0.75"
       />
       <circle cx="23" cy="17" r="2.2" fill="#FFFFFF" opacity="0.9" />
+    </svg>
+  </div>
+);
+
+// 4c. Storybook Dog Biscuit SVG — chunky cartoon biscuit with paw stamp
+const StorybookDogBiscuitSVG: React.FC<{ isNear: boolean }> = ({ isNear }) => (
+  <div className="relative flex flex-col items-center">
+    <div
+      className={`absolute -inset-2 rounded-full pointer-events-none transition-all duration-300 ${
+        isNear ? 'bg-amber-300/60 blur-md scale-125' : 'bg-yellow-200/35 blur-sm animate-pulse'
+      }`}
+    />
+    <svg width="64" height="52" viewBox="0 0 64 52" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-lg overflow-visible">
+      <defs>
+        <linearGradient id="dogBiscuitGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FCD34D" />
+          <stop offset="55%" stopColor="#D97706" />
+          <stop offset="100%" stopColor="#92400E" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="32" cy="45" rx="22" ry="4" fill="#14532D" opacity="0.28" />
+      <path
+        d="M13 17 C9 12,3 14,4 20 C-1 23,1 31,7 31 C6 37,13 40,17 35 L47 35 C51 40,58 37,57 31 C63 31,65 23,60 20 C61 14,55 12,51 17 L47 20 L17 20 Z"
+        fill="url(#dogBiscuitGrad)"
+        stroke="#78350F"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <rect x="17" y="20" width="30" height="15" rx="7.5" fill="#F59E0B" opacity="0.9" />
+      <ellipse cx="32" cy="29" rx="4.2" ry="3.6" fill="#92400E" opacity="0.72" />
+      <circle cx="25.8" cy="24.8" r="2" fill="#92400E" opacity="0.72" />
+      <circle cx="30.1" cy="23.4" r="2" fill="#92400E" opacity="0.72" />
+      <circle cx="34.4" cy="23.4" r="2" fill="#92400E" opacity="0.72" />
+      <circle cx="38.7" cy="24.8" r="2" fill="#92400E" opacity="0.72" />
+      <circle cx="20" cy="29" r="1" fill="#78350F" opacity="0.45" />
+      <circle cx="44" cy="27" r="1.1" fill="#78350F" opacity="0.45" />
+      <circle cx="42" cy="32" r="0.8" fill="#78350F" opacity="0.38" />
+      <circle cx="54" cy="12" r="1.6" fill="#D97706" />
+      <circle cx="58" cy="9" r="1" fill="#F59E0B" />
+      <circle cx="8" cy="11" r="1.2" fill="#D97706" />
+    </svg>
+  </div>
+);
+
+// 4d. Very Full Cartoon Dog Food Bowl — overflowing kibble
+const StorybookFullDogBowlSVG: React.FC<{ isNear: boolean }> = ({ isNear }) => (
+  <div className="relative flex flex-col items-center">
+    <div
+      className={`absolute -inset-3 rounded-full pointer-events-none transition-all duration-300 ${
+        isNear ? 'bg-orange-300/55 blur-md scale-125' : 'bg-amber-200/35 blur-sm animate-pulse'
+      }`}
+    />
+    <svg width="82" height="62" viewBox="0 0 82 62" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-lg overflow-visible">
+      <defs>
+        <linearGradient id="fullBowlRed" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FB7185" />
+          <stop offset="100%" stopColor="#BE123C" />
+        </linearGradient>
+        <radialGradient id="kibblePile" cx="50%" cy="35%" r="70%">
+          <stop offset="0%" stopColor="#D97706" />
+          <stop offset="70%" stopColor="#92400E" />
+          <stop offset="100%" stopColor="#78350F" />
+        </radialGradient>
+      </defs>
+
+      <ellipse cx="41" cy="56" rx="29" ry="5" fill="#14532D" opacity="0.3" />
+
+      {/* Giant pile so the bowl looks VERY full, like a cartoon */}
+      <path
+        d="M19 28 C20 16,29 9,41 11 C48 5,60 12,61 21 C68 20,72 27,66 33 L16 33 C12 29,14 25,19 28 Z"
+        fill="url(#kibblePile)"
+        stroke="#78350F"
+        strokeWidth="1.5"
+      />
+
+      <circle cx="24" cy="25" r="3.3" fill="#B45309" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="31" cy="18" r="3.4" fill="#D97706" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="39" cy="21" r="3.2" fill="#B45309" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="47" cy="15" r="3.5" fill="#D97706" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="55" cy="21" r="3.3" fill="#B45309" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="60" cy="27" r="3" fill="#D97706" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="29" cy="29" r="3.2" fill="#D97706" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="37" cy="27" r="3.4" fill="#B45309" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="45" cy="30" r="3.1" fill="#D97706" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="53" cy="27" r="3.4" fill="#B45309" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="34" cy="13" r="2.6" fill="#D97706" stroke="#78350F" strokeWidth="0.6" />
+      <circle cx="51" cy="10" r="2.4" fill="#B45309" stroke="#78350F" strokeWidth="0.6" />
+
+      {/* Pieces spilling out */}
+      <circle cx="13" cy="38" r="3" fill="#B45309" stroke="#78350F" strokeWidth="0.7" />
+      <circle cx="69" cy="37" r="2.8" fill="#D97706" stroke="#78350F" strokeWidth="0.7" />
+      <circle cx="65" cy="44" r="2.3" fill="#B45309" stroke="#78350F" strokeWidth="0.7" />
+
+      <ellipse cx="41" cy="34" rx="29" ry="8" fill="#FDA4AF" stroke="#9F1239" strokeWidth="1.6" />
+      <ellipse cx="41" cy="33" rx="24" ry="5.2" fill="#7C2D12" />
+
+      {/* More food visible inside the rim */}
+      <ellipse cx="41" cy="31.5" rx="21" ry="4.3" fill="#92400E" />
+      <circle cx="27" cy="30.5" r="3.2" fill="#D97706" />
+      <circle cx="35" cy="31" r="3.5" fill="#B45309" />
+      <circle cx="43" cy="30" r="3.4" fill="#D97706" />
+      <circle cx="51" cy="31" r="3.2" fill="#B45309" />
+      <circle cx="58" cy="30.5" r="2.8" fill="#D97706" />
+
+      <path
+        d="M13 35 C15 51,22 55,41 55 C60 55,67 51,69 35 C60 39,22 39,13 35 Z"
+        fill="url(#fullBowlRed)"
+        stroke="#9F1239"
+        strokeWidth="1.7"
+      />
+
+      {/* Bone badge */}
+      <g transform="translate(31 41)">
+        <path
+          d="M2 4 C0 2,0 0,2 0 C3 0,4 1,5 2 L15 2 C16 1,17 0,18 0 C20 0,20 2,18 4 C20 6,20 8,18 8 C17 8,16 7,15 6 L5 6 C4 7,3 8,2 8 C0 8,0 6,2 4 Z"
+          fill="#FFF7ED"
+          stroke="#9F1239"
+          strokeWidth="0.8"
+        />
+      </g>
+
+      <path d="M20 42 Q24 47 31 48" stroke="#FFE4E6" strokeWidth="2" strokeLinecap="round" opacity="0.9" />
     </svg>
   </div>
 );
