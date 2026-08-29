@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { PlayerProfile } from '../../types';
 import { PET_LOGIC_LEVELS, CODE_PET_LEVELS, PETS } from '../../data/levels';
 import { PetAvatar } from '../pet/PetAvatar';
@@ -35,13 +35,14 @@ export const GameHubView: React.FC<GameHubViewProps> = ({
   onOpenTrajectories,
   onUnlockAllLevels,
 }) => {
-  const isCodePetUnlocked =
-    profile.unlockedLevels.some((l) => l.startsWith('code-')) ||
-    profile.completedLevels.filter((l) => l.startsWith('logic-')).length >= 3;
-
-  const totalPossibleLevels = PET_LOGIC_LEVELS.length + CODE_PET_LEVELS.length;
-  const completedCount = profile.completedLevels.length;
-  const progressPercent = Math.round((completedCount / totalPossibleLevels) * 100);
+  // Game 2 is intentionally disabled for the current hackathon MVP.
+  // Progress reflects the playable Pet Logic experience only.
+  const completedPetLogicLevels = profile.completedLevels.filter((levelId) =>
+    levelId.startsWith('logic-')
+  ).length;
+  const progressPercent = Math.round(
+    (completedPetLogicLevels / PET_LOGIC_LEVELS.length) * 100
+  );
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
@@ -135,7 +136,7 @@ export const GameHubView: React.FC<GameHubViewProps> = ({
             </p>
 
             <p className="text-sm text-purple-800/80 mt-3 leading-relaxed">
-              Use the keyboard to guide {profile.pet.name || 'Manchu'} through playful logic challenges while learning sequences, commands, IF conditions, and loops.
+              Use the keyboard to guide {profile.pet.name || 'Manchu'} through playful logic challenges while learning sequences, variables, algorithms, functions, data types, and IF conditions.
             </p>
 
             {/* Level Highlights */}
@@ -174,92 +175,69 @@ export const GameHubView: React.FC<GameHubViewProps> = ({
           </div>
         </div>
 
-        {/* GAME 2: CODE YOUR PET */}
-        <div
-          className={`bg-white rounded-3xl p-6 md:p-8 border-2 transition-all flex flex-col justify-between relative overflow-hidden group ${
-            isCodePetUnlocked
-              ? 'border-purple-200/90 shadow-md hover:shadow-xl'
-              : 'border-gray-200/80 bg-gray-50/50 opacity-90'
-          }`}
-        >
-          <div className="absolute top-0 right-0 w-36 h-36 bg-purple-100/50 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+        {/* GAME 2: CODE YOUR PET — COMING SOON */}
+        <div className="bg-gray-50 rounded-3xl p-6 md:p-8 border-2 border-gray-200 flex flex-col justify-between relative overflow-hidden opacity-90">
+          <div className="absolute top-0 right-0 w-36 h-36 bg-gray-200/40 rounded-bl-full pointer-events-none" />
 
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xl shadow-xs">
-                <Code className="w-6 h-6" />
-              </div>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${
-                  isCodePetUnlocked
-                    ? 'bg-purple-50 border-purple-200 text-purple-700'
-                    : 'bg-gray-100 border-gray-200 text-gray-500'
-                }`}
-              >
-                Game 2 &bull; 5 Levels
+            <div className="mb-4">
+              <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-gray-800 text-white rounded-full text-xs font-black uppercase tracking-wider shadow-xs">
+                <Lock className="w-3.5 h-3.5" />
+                <span>Coming Soon</span>
               </span>
             </div>
 
-            <h2 className="font-['Outfit'] font-extrabold text-2xl text-purple-950">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-xl">
+                <Code className="w-6 h-6" />
+              </div>
+
+              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border bg-gray-100 border-gray-200 text-gray-500">
+                Game 2 &bull; Future Levels
+              </span>
+            </div>
+
+            <h2 className="font-['Outfit'] font-extrabold text-2xl text-gray-700">
               CODE YOUR PET
             </h2>
-            <p className="text-xs font-bold text-purple-600 uppercase tracking-wider mt-0.5">
+
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">
               "Turn your logic into real JavaScript."
             </p>
 
-            <p className="text-sm text-purple-800/80 mt-3 leading-relaxed">
-              Transition smoothly from visual blocks into real, executable beginner JavaScript code! Use real variables, if statements, loops, and functions.
+            <p className="text-sm text-gray-500 mt-3 leading-relaxed">
+              A future game where learners will move from visual logic into beginner JavaScript with variables, IF statements, loops, and functions.
             </p>
 
-            {/* Level Highlights */}
             <div className="mt-4 grid grid-cols-5 gap-1.5">
-              {CODE_PET_LEVELS.map((lvl) => {
-                const isDone = profile.completedLevels.includes(lvl.id);
-                const isUnlocked = profile.unlockedLevels.includes(lvl.id);
-                return (
-                  <div
-                    key={lvl.id}
-                    className={`py-2 px-1 rounded-xl text-center border text-[11px] font-bold transition-all ${
-                      isDone
-                        ? 'bg-emerald-100 border-emerald-300 text-emerald-800'
-                        : isUnlocked
-                        ? 'bg-purple-100 border-purple-300 text-purple-800'
-                        : 'bg-gray-100 border-gray-200 text-gray-400'
-                    }`}
-                  >
-                    <span>L{lvl.number}</span>
-                    <span className="block text-[9px]">{isDone ? '⭐' : isUnlocked ? '▶' : '🔒'}</span>
-                  </div>
-                );
-              })}
+              {CODE_PET_LEVELS.map((lvl) => (
+                <div
+                  key={lvl.id}
+                  className="py-2 px-1 rounded-xl text-center border text-[11px] font-bold bg-gray-100 border-gray-200 text-gray-400"
+                >
+                  <span>L{lvl.number}</span>
+                  <span className="block text-[9px]">🔒</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-purple-100 flex items-center justify-between">
-            {isCodePetUnlocked ? (
-              <button
-                id="hub-play-code-pet-btn"
-                onClick={() => onOpenCodePet()}
-                className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-['Outfit'] font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2"
-              >
-                <Play className="w-4 h-4 fill-current" />
-                <span>Code in JavaScript</span>
-              </button>
-            ) : (
-              <div className="w-full flex items-center justify-between p-3 bg-purple-50/80 rounded-2xl border border-purple-100">
-                <div className="flex items-center space-x-2 text-xs text-purple-800 font-semibold">
-                  <Lock className="w-4 h-4 text-purple-500" />
-                  <span>Unlocks after Level 3 of Pet Logic!</span>
-                </div>
-                <button
-                  onClick={onUnlockAllLevels}
-                  className="text-xs font-bold text-pink-600 hover:underline flex items-center space-x-1"
-                >
-                  <Unlock className="w-3 h-3" />
-                  <span>Demo Unlock</span>
-                </button>
-              </div>
-            )}
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <button
+              id="hub-play-code-pet-btn"
+              type="button"
+              disabled
+              aria-disabled="true"
+              title="Code Your Pet is coming soon"
+              className="w-full py-3.5 px-6 rounded-2xl bg-gray-200 text-gray-500 font-['Outfit'] font-bold text-sm border border-gray-300 flex items-center justify-center space-x-2 cursor-not-allowed select-none"
+            >
+              <Lock className="w-4 h-4" />
+              <span>Coming Soon</span>
+            </button>
+
+            <p className="text-[11px] text-gray-500 font-semibold text-center mt-2">
+              Not available in this version.
+            </p>
           </div>
         </div>
       </div>
