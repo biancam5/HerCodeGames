@@ -1,4 +1,4 @@
- import React, { useState, useEffect, useCallback } from 'react';
+  import React, { useState, useEffect, useCallback } from 'react';
 import {
   PlayerProfile,
   CommandType,
@@ -95,6 +95,8 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
     switch (cmd) {
       case 'MOVE':
         return 'move();';
+      case 'MOVE_BACK':
+        return 'moveBack();';
       case 'JUMP':
         return 'jump();';
       case 'EAT':
@@ -107,10 +109,14 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
         return 'sleep();';
       case 'COLLECT':
         return 'collectStar();';
+      case 'COLLECT_TREAT':
+        return 'collectTreat();';
       case 'REPEAT_3':
         return 'for (let i = 0; i < 3; i++) {\n  collectStar();\n}';
       case 'IF_HUNGRY':
         return 'if (hunger > 50) {\n  eat();\n}';
+      case 'IF_NOT_HUNGRY':
+        return 'if (hunger <= 50) {\n  wait();\n}';
       default:
         return 'doAction();';
     }
@@ -209,16 +215,22 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
           'You built a longer sequence! Each step in your sequence helped Manchu reach the ball and play.';
         logicDeepDive = `How your code worked: ${profile.pet.name} stepped forward 3 times with move() and then played with the tennis ball using play()!`;
       } else if (activeLevel.id === 'logic-3') {
-  conceptTitle = 'VARIABLES & ALGORITHMS! 🧠';
-  conceptExplanation =
-    'A Variable is like a box that contains an object. An algorithm is a step-by-step plan used to solve a problem.';
-  logicDeepDive = `Your algorithm was: move(), jump(), move(). It helped ${profile.pet.name} get over the puddle and finish the path.`;
-} else if (activeLevel.id === 'logic-4') {
-        conceptTitle = 'MAGIC LOOPS MASTERED! 🔁';
+        conceptTitle = 'VARIABLES & ALGORITHMS! 🧠';
         conceptExplanation =
-          'A loop tells the computer to repeat instructions without writing the same code over and over.';
+          'A variable stores information, while an algorithm is a step-by-step plan used to solve a problem.';
+        logicDeepDive = `Your algorithm was: move(), jump(), move(). It helped ${profile.pet.name} get over the puddle and finish the path.`;
+      } else if (activeLevel.id === 'logic-4') {
+        conceptTitle = 'FUNCTIONS & DATA TYPES! 🍪';
+        conceptExplanation =
+          'A function is a reusable piece of code that performs a task. Data types are different kinds of information, like different candy flavors.';
         logicDeepDive =
-          'How your code worked: Your loop collected 3 star berries with one single repeated command!';
+          'Every time you found a biscuit, collectTreat() performed one clear job. Your program also worked with numbers, text, and true/false information.';
+      } else if (activeLevel.id === 'logic-5') {
+        conceptTitle = 'SMART DECISIONS WITH IF! ⚡';
+        conceptExplanation =
+          'A condition is a rule the computer checks. An if statement runs an action only when that condition is true.';
+        logicDeepDive =
+          'You checked Manchu’s hunger three times and chose the correct rule each time. That is how programs make decisions!';
       }
 
       setTimeout(() => {
@@ -257,10 +269,17 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
           ...nextState,
           position: Math.min(4, nextState.position + 1),
           energy: Math.max(10, nextState.energy - 2),
-          starsCollected:
-            activeLevel.number >= 4
-              ? Math.min(3, nextState.starsCollected + 1)
-              : nextState.starsCollected,
+          currentAction: 'walking',
+          mood: 'happy',
+        };
+        setConfusedMessage(null);
+        break;
+
+      case 'MOVE_BACK':
+        nextState = {
+          ...nextState,
+          position: Math.max(0, nextState.position - 1),
+          energy: Math.max(10, nextState.energy - 2),
           currentAction: 'walking',
           mood: 'happy',
         };
@@ -336,6 +355,41 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
         break;
       }
 
+      case 'COLLECT_TREAT': {
+        const collected = nextState.treatsCollected ?? 0;
+        const expectedPosition = activeLevel.treatPositions?.[collected];
+
+        if (
+          expectedPosition !== undefined &&
+          nextState.position === expectedPosition
+        ) {
+          nextState = {
+            ...nextState,
+            treatsCollected: Math.min(activeLevel.totalTreats ?? 6, collected + 1),
+            happiness: Math.min(100, nextState.happiness + 5),
+            currentAction: 'celebrating',
+            mood: 'celebrating',
+          };
+          setConfusedMessage(null);
+        } else {
+          nextState = {
+            ...nextState,
+            currentAction: 'thinking',
+            mood: 'confused',
+          };
+          setConfusedMessage(
+            'The biscuit is somewhere else in the garden. Move Manchu to it before collecting!'
+          );
+        }
+        break;
+      }
+
+      case 'IF_HUNGRY':
+      case 'IF_NOT_HUNGRY': {
+        // Level 5 choices are handled by handleSmartDecision().
+        break;
+      }
+
       case 'BATH':
         nextState = {
           ...nextState,
@@ -370,25 +424,88 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
         };
         setConfusedMessage(null);
         break;
-
-      case 'IF_HUNGRY':
-        if (nextState.hunger > 50) {
-          nextState = {
-            ...nextState,
-            hunger: Math.max(0, nextState.hunger - 60),
-            happiness: Math.min(100, nextState.happiness + 25),
-            currentAction: 'eating',
-            mood: 'eating',
-          };
-        }
-        setConfusedMessage(null);
-        break;
     }
 
     setPetState(nextState);
 
     setTimeout(() => {
       setPetState((p) => ({ ...p, currentAction: undefined }));
+    }, 700);
+
+    checkVictory(nextState, nextCmds);
+  };
+
+  const handleSmartDecision = (choice: 'eat' | 'wait') => {
+    if (hasWon || activeLevel.id !== 'logic-5') return;
+
+    const values = activeLevel.decisionHungerValues ?? [80, 30, 65];
+    const decisionIndex = petState.decisionIndex ?? 0;
+    const hunger = values[decisionIndex];
+
+    if (hunger === undefined) return;
+
+    const shouldEat = hunger > 50;
+    const isCorrect =
+      (choice === 'eat' && shouldEat) ||
+      (choice === 'wait' && !shouldEat);
+
+    const cmd: CommandType =
+      choice === 'eat' ? 'IF_HUNGRY' : 'IF_NOT_HUNGRY';
+
+    const nextCmds = [...executedCommands, cmd];
+    setExecutedCommands(nextCmds);
+
+    if (!isCorrect) {
+      setPetState((prev) => ({
+        ...prev,
+        currentAction: 'thinking',
+        mood: 'confused',
+      }));
+
+      setConfusedMessage(
+        shouldEat
+          ? `Manchu's hunger is ${hunger}%. That is more than 50, so which rule should run?`
+          : `Manchu's hunger is only ${hunger}%. That is 50 or less, so does he need dinner right now?`
+      );
+
+      setTimeout(() => {
+        setPetState((prev) => ({
+          ...prev,
+          currentAction: undefined,
+          mood: 'happy',
+        }));
+      }, 700);
+
+      return;
+    }
+
+    const nextDecisionIndex = decisionIndex + 1;
+    const nextHunger =
+      values[nextDecisionIndex] !== undefined
+        ? values[nextDecisionIndex]
+        : choice === 'eat'
+        ? Math.max(0, hunger - 60)
+        : hunger;
+
+    const nextState: PetState = {
+      ...petState,
+      hunger: nextHunger,
+      correctDecisions: (petState.correctDecisions ?? 0) + 1,
+      decisionIndex: nextDecisionIndex,
+      happiness: Math.min(100, petState.happiness + 7),
+      currentAction: choice === 'eat' ? 'eating' : 'celebrating',
+      mood: choice === 'eat' ? 'eating' : 'happy',
+    };
+
+    setPetState(nextState);
+    setConfusedMessage(null);
+
+    setTimeout(() => {
+      setPetState((prev) => ({
+        ...prev,
+        currentAction: undefined,
+        mood: 'happy',
+      }));
     }, 700);
 
     checkVictory(nextState, nextCmds);
@@ -427,16 +544,7 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
 
       handleAction('MOVE');
     } else {
-      setPetState((prev) => ({
-        ...prev,
-        position: Math.max(0, prev.position - 1),
-        currentAction: 'walking',
-        mood: 'happy',
-      }));
-
-      setTimeout(() => {
-        setPetState((p) => ({ ...p, currentAction: undefined }));
-      }, 350);
+      handleAction('MOVE_BACK');
     }
   };
 
@@ -450,6 +558,10 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
 
   const handleManualJump = () => {
     handleAction('JUMP');
+  };
+
+  const handleManualCollectTreat = () => {
+    handleAction('COLLECT_TREAT');
   };
 
   // Navigate from the ACTUAL active level rather than the original levelId.
@@ -502,8 +614,12 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
       ? `Computers run instructions in exact order. Help ${profile.pet.name} reach the steak before using eat().`
       : activeLevel.id === 'logic-2'
       ? `Think about the order: first reach the tennis ball, then use play().`
-     : activeLevel.id === 'logic-3'
+      : activeLevel.id === 'logic-3'
       ? `There is an obstacle in the path. Build a step-by-step plan: walk, jump over the puddle, then keep moving.`
+      : activeLevel.id === 'logic-4'
+      ? `Only one biscuit appears at a time. Look at where it is, move left or right, and collect it when Manchu reaches it.`
+      : activeLevel.id === 'logic-5'
+      ? `Compare Manchu's hunger with 50. If it is above 50, he should eat. If it is 50 or less, he should wait.`
       : `Look at what happened in the game and try changing your next command.`;
 
   return (
@@ -607,12 +723,10 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {activeLevel.number === 2 ? (
           <>
-            {/* Level 2 — Step */}
             <div className="bg-white rounded-2xl p-3.5 border-2 border-purple-100 shadow-2xs flex items-start space-x-3">
               <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5">
                 <BookOpen className="w-4 h-4 text-purple-600" />
               </div>
-
               <div>
                 <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
                   WHAT IS A STEP?
@@ -623,89 +737,136 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
               </div>
             </div>
 
-            {/* Level 2 — Code */}
             <div className="bg-white rounded-2xl p-3.5 border-2 border-pink-100 shadow-2xs flex items-start space-x-3">
               <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center shrink-0 mt-0.5">
                 <Code2 className="w-4 h-4 text-pink-600" />
               </div>
-
               <div>
                 <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
                   WHAT IS CODE?
                 </h3>
                 <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-                  <strong>Code</strong> is the written language programmers use
-                  to create games, apps, and computer programs.
+                  <strong>Code</strong> is the written language programmers use to create games, apps, and computer programs.
                 </p>
               </div>
             </div>
           </>
         ) : activeLevel.number === 3 ? (
-  <>
-    {/* Level 3 — Program */}
-    <div className="bg-white rounded-2xl p-3.5 border-2 border-purple-100 shadow-2xs flex items-start space-x-3">
-      <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5">
-        <Terminal className="w-4 h-4 text-purple-600" />
-      </div>
-
-      <div>
-        <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
-          WHAT IS A VARIABLE?
-        </h3>
-        <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-          A <strong>Variable</strong> is a container used to store data values , like a box that contains important objects like books .
-        </p>
-      </div>
-    </div>
-
-    {/* Level 3 — Algorithm */}
-    <div className="bg-white rounded-2xl p-3.5 border-2 border-pink-100 shadow-2xs flex items-start space-x-3">
-      <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center shrink-0 mt-0.5">
-        <Sparkles className="w-4 h-4 text-pink-600" />
-      </div>
-
-      <div>
-        <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
-          WHAT IS AN ALGORITHM?
-        </h3>
-        <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-          An <strong>algorithm</strong> is a step-by-step plan to solve a problem.
-        </p>
-      </div>
-    </div>
-  </>
-        ) : (
           <>
-            {/* Level 1/default — Sequence */}
+            <div className="bg-white rounded-2xl p-3.5 border-2 border-purple-100 shadow-2xs flex items-start space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5">
+                <Terminal className="w-4 h-4 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
+                  WHAT IS A VARIABLE?
+                </h3>
+                <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+                  A <strong>variable</strong> is like a labeled box that stores information in a program.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-3.5 border-2 border-pink-100 shadow-2xs flex items-start space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center shrink-0 mt-0.5">
+                <Sparkles className="w-4 h-4 text-pink-600" />
+              </div>
+              <div>
+                <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
+                  WHAT IS AN ALGORITHM?
+                </h3>
+                <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+                  An <strong>algorithm</strong> is a step-by-step plan to solve a problem.
+                </p>
+              </div>
+            </div>
+          </>
+        ) : activeLevel.number === 4 ? (
+          <>
+            <div className="bg-white rounded-2xl p-3.5 border-2 border-purple-100 shadow-2xs flex items-start space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5">
+                <Code2 className="w-4 h-4 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
+                  WHAT IS A FUNCTION?
+                </h3>
+                <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+                  A <strong>function</strong> is a reusable piece of code that performs one specific task.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-3.5 border-2 border-pink-100 shadow-2xs flex items-start space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center shrink-0 mt-0.5">
+                <Sparkles className="w-4 h-4 text-pink-600" />
+              </div>
+              <div>
+                <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
+                  WHAT ARE DATA TYPES?
+                </h3>
+                <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+                  Data types are different kinds of information, like different candy flavors: a <strong>number</strong>, <strong>text</strong>, or <strong>true/false</strong>.
+                </p>
+              </div>
+            </div>
+          </>
+        ) : activeLevel.number === 5 ? (
+          <>
             <div className="bg-white rounded-2xl p-3.5 border-2 border-purple-100 shadow-2xs flex items-start space-x-3">
               <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5">
                 <BookOpen className="w-4 h-4 text-purple-600" />
               </div>
+              <div>
+                <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
+                  WHAT IS A CONDITION?
+                </h3>
+                <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+                  A <strong>condition</strong> is a rule the computer checks before making a decision.
+                </p>
+              </div>
+            </div>
 
+            <div className="bg-white rounded-2xl p-3.5 border-2 border-pink-100 shadow-2xs flex items-start space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center shrink-0 mt-0.5">
+                <Terminal className="w-4 h-4 text-pink-600" />
+              </div>
+              <div>
+                <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
+                  WHAT DOES IF MEAN?
+                </h3>
+                <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+                  <strong>if</strong> means: “Do this only when something is true.”
+                </p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="bg-white rounded-2xl p-3.5 border-2 border-purple-100 shadow-2xs flex items-start space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5">
+                <BookOpen className="w-4 h-4 text-purple-600" />
+              </div>
               <div>
                 <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
                   What is a sequence?
                 </h3>
                 <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-                  A <strong>sequence</strong> is a set of instructions that
-                  happen in order.
+                  A <strong>sequence</strong> is a set of instructions that happen in order.
                 </p>
               </div>
             </div>
 
-            {/* Level 1/default — Command */}
             <div className="bg-white rounded-2xl p-3.5 border-2 border-pink-100 shadow-2xs flex items-start space-x-3">
               <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center shrink-0 mt-0.5">
                 <Terminal className="w-4 h-4 text-pink-600" />
               </div>
-
               <div>
                 <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
                   What is a command?
                 </h3>
                 <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-                  A <strong>command</strong> tells the computer what action to
-                  do.
+                  A <strong>command</strong> tells the computer what action to do.
                 </p>
               </div>
             </div>
@@ -730,15 +891,106 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
                 ? activeLevel.targetPosition
                 : activeLevel.foodBowlPosition
             }
+            currentTreatPosition={
+              activeLevel.id === 'logic-4'
+                ? activeLevel.treatPositions?.[petState.treatsCollected ?? 0]
+                : undefined
+            }
+            totalTreats={activeLevel.totalTreats}
             showMeters={true}
             stageTitle={`${profile.pet.name}'s Garden`}
-            starsGoal={activeLevel.number >= 4 ? 3 : 0}
-            interactiveGameMode={true}
+            starsGoal={0}
+            interactiveGameMode={activeLevel.id !== 'logic-5'}
             onManualMove={handleManualMove}
             onManualEat={handleManualEat}
             onManualPlay={handleManualPlay}
             onManualJump={handleManualJump}
+            onManualCollectTreat={handleManualCollectTreat}
           />
+
+          {activeLevel.id === 'logic-5' && !hasWon && (
+            <div className="bg-white rounded-2xl p-4 border-2 border-purple-200 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-wider text-purple-600">
+                    Smart Decision {(petState.decisionIndex ?? 0) + 1} of {activeLevel.requiredCorrectDecisions ?? 3}
+                  </p>
+                  <h3 className="font-['Outfit'] font-black text-lg text-slate-950">
+                    Should Manchu eat?
+                  </h3>
+                </div>
+
+                <div className="flex gap-1.5">
+                  {Array.from({ length: activeLevel.requiredCorrectDecisions ?? 3 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black border-2 ${
+                        index < (petState.correctDecisions ?? 0)
+                          ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
+                          : index === (petState.decisionIndex ?? 0)
+                          ? 'bg-purple-100 border-purple-300 text-purple-700'
+                          : 'bg-slate-50 border-slate-200 text-slate-400'
+                      }`}
+                    >
+                      {index < (petState.correctDecisions ?? 0) ? '✓' : index + 1}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-rose-50 border-2 border-rose-200 rounded-2xl p-4 text-center">
+                <p className="text-xs font-black text-rose-700 uppercase tracking-wider">
+                  Manchu's Hunger
+                </p>
+                <p className="text-4xl font-black text-rose-600 mt-1">
+                  {petState.hunger}%
+                </p>
+                <div className="max-w-sm mx-auto h-3 bg-rose-100 rounded-full overflow-hidden mt-3 border border-rose-200">
+                  <div
+                    className="h-full bg-gradient-to-r from-rose-400 to-pink-500 transition-all duration-500"
+                    style={{ width: `${Math.min(100, petState.hunger)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-slate-600 font-semibold mt-2">
+                  Compare the number with 50, then choose the rule that is true.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  id="logic-5-eat-decision"
+                  onClick={() => handleSmartDecision('eat')}
+                  className="p-4 rounded-2xl bg-rose-50 hover:bg-rose-100 border-2 border-rose-300 text-left transition-all active:scale-98 cursor-pointer"
+                >
+                  <span className="block text-[10px] uppercase tracking-wider text-rose-600 font-black mb-1">
+                    RULE A
+                  </span>
+                  <span className="block font-mono text-sm font-black text-slate-900">
+                    IF hunger &gt; 50 → EAT
+                  </span>
+                  <span className="block text-xs text-slate-600 mt-1">
+                    Feed Manchu when he is really hungry.
+                  </span>
+                </button>
+
+                <button
+                  id="logic-5-wait-decision"
+                  onClick={() => handleSmartDecision('wait')}
+                  className="p-4 rounded-2xl bg-purple-50 hover:bg-purple-100 border-2 border-purple-300 text-left transition-all active:scale-98 cursor-pointer"
+                >
+                  <span className="block text-[10px] uppercase tracking-wider text-purple-600 font-black mb-1">
+                    RULE B
+                  </span>
+                  <span className="block font-mono text-sm font-black text-slate-900">
+                    IF hunger ≤ 50 → WAIT
+                  </span>
+                  <span className="block text-xs text-slate-600 mt-1">
+                    Let Manchu wait when he is not very hungry.
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Quick Level Actions (for later multi-action levels) */}
           {activeLevel.availableCommands.length > 3 && (
@@ -853,6 +1105,8 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
                   <p>
                     {activeLevel.id === 'logic-3'
                       ? 'Press [ ◀ ▶ ] or [ SPACE ]'
+                      : activeLevel.id === 'logic-5'
+                      ? 'Choose a smart IF rule below'
                       : 'Press [ ◀ ▶ ] or [ ENTER ]'}
                   </p>
                   <p className="text-[11px] text-purple-400/80">
