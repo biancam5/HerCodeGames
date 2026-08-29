@@ -87,7 +87,9 @@ Every challenge encourages logical thinking, sequencing, experimentation, and pr
 
 ## 🎥 Demo
 
-### Play the game !
+### Play the game ! HERE 👏
+
+https://hercodegames.netlify.app/
 
 ## Note : Currently only available until level 2 of Pet logic game! ( Still building this beautiful project. The main idea is to have many games . If you want to contribute send me a message! )
 
@@ -96,12 +98,6 @@ Every challenge encourages logical thinking, sequencing, experimentation, and pr
 *Coming soon — gameplay walkthrough will be added after deployment.*
 
 <!-- Replace this section with your demo video link or thumbnail -->
-
-### 🌐 Live Demo
-
-**Coming soon**
-
-<!-- Add deployed application URL here -->
 
 ---
 
