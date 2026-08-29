@@ -1,0 +1,7 @@
+{
+  "name": "HerCodeGames",
+  "description": "Coding game for Girls — Learn how fun Technology can be ! Learn logic and fundamental programming with games.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
