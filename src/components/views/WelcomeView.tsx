@@ -2,7 +2,17 @@ import React, { useState, useRef } from 'react';
 import { PetType, PlayerProfile } from '../../types';
 import { PETS } from '../../data/levels';
 import { PetAvatar } from '../pet/PetAvatar';
-import { Sparkles, ArrowRight, Play, Compass, Users, Check, Wand2, AlertCircle, Lock } from 'lucide-react';
+import {
+  Sparkles,
+  ArrowRight,
+  Play,
+  Compass,
+  Users,
+  Check,
+  Wand2,
+  AlertCircle,
+  Lock,
+} from 'lucide-react';
 
 interface WelcomeViewProps {
   existingProfile: PlayerProfile | null;
@@ -26,7 +36,7 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
   const [selectedPet, setSelectedPet] = useState<PetType>('dog');
   const [selectedPetMood, setSelectedPetMood] = useState<'happy' | 'eating' | 'sleeping' | 'playing'>('eating');
   const [playerName, setPlayerName] = useState<string>('');
-  const [petCustomName, setPetCustomName] = useState<string>(PETS['dog'].defaultName);
+  const [petCustomName, setPetCustomName] = useState<string>(PETS['cat'].defaultName);
   const [isCreatingNew, setIsCreatingNew] = useState<boolean>(!existingProfile);
   const [showSwitchModal, setShowSwitchModal] = useState<boolean>(false);
   const [nameError, setNameError] = useState<string | null>(null);
@@ -35,14 +45,17 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
   const playerNameInputRef = useRef<HTMLInputElement>(null);
   const petNameInputRef = useRef<HTMLInputElement>(null);
 
-  const handlePetChange = (type: PetType) => {
-    if (type !== 'dog') return;
+ const handlePetChange = (type: PetType) => {
+  if (type !== 'dog') return;
 
-    setSelectedPet(type);
-    setPetCustomName(PETS[type].defaultName);
-    setSelectedPetMood('eating');
-    if (petNameError) setPetNameError(null);
-  };
+  setSelectedPet(type);
+  setPetCustomName(PETS[type].defaultName);
+  setSelectedPetMood('eating');
+
+  if (petNameError) {
+    setPetNameError(null);
+  }
+};
 
   const handlePlayerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -86,10 +99,10 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
 
     // MVP safety guard: only Manchu is playable in this version.
     if (selectedPet !== 'dog') {
-      setSelectedPet('dog');
-      setPetCustomName(PETS['dog'].defaultName);
-      return;
-    }
+    setSelectedPet('dog');
+    setPetCustomName(PETS['dog'].defaultName);
+    return;
+  }
 
     onStartAdventure(playerName.trim(), selectedPet, petCustomName.trim());
   };
@@ -285,92 +298,102 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
             )}
           </div>
 
-          {/* Pet Choice */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <label className="block text-xs font-bold uppercase tracking-wider text-purple-900">
-                Choose your best friend:
-              </label>
-              <span className="text-[11px] text-pink-600 font-semibold">
-                Manchu is available now
+         {/* Pet Choice */}
+<div>
+  <div className="mb-2 flex items-center justify-between">
+    <label className="block text-xs font-bold uppercase tracking-wider text-purple-900">
+      Choose your best friend:
+    </label>
+
+    <span className="text-[11px] text-pink-600 font-semibold">
+      Manchu is available now
+    </span>
+  </div>
+
+  <div className="mb-3 rounded-2xl bg-purple-50 border border-purple-200 px-4 py-3 flex items-center gap-3">
+    <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+      <Lock className="w-4 h-4 text-purple-700" />
+    </div>
+
+    <div>
+      <p className="text-sm font-black text-purple-950">
+        More pet adventures are coming soon!
+      </p>
+
+      <p className="text-xs font-medium text-purple-700 mt-0.5">
+        Manchu the Dalmatian is the only available character in this version.
+      </p>
+    </div>
+  </div>
+
+  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+    {(Object.keys(PETS) as PetType[]).map((type) => {
+      const pet = PETS[type];
+      const isAvailable = type === 'dog';
+      const isSelected = selectedPet === type;
+
+      return (
+        <button
+          key={type}
+          type="button"
+          id={`welcome-select-pet-${type}`}
+          disabled={!isAvailable}
+          onClick={() => handlePetChange(type)}
+          className={`relative p-2.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-between overflow-hidden ${
+            isAvailable
+              ? isSelected
+                ? 'border-pink-500 bg-pink-50/95 shadow-md scale-104 ring-2 ring-pink-300 cursor-pointer'
+                : 'border-gray-200 bg-white hover:bg-pink-50/40 hover:border-pink-200 cursor-pointer'
+              : 'border-slate-200 bg-slate-50 cursor-not-allowed'
+          }`}
+        >
+          <div className="w-full flex justify-end min-h-[28px]">
+            {isAvailable ? (
+              <span className="text-[9px] bg-emerald-50 border border-emerald-200 rounded-full px-2 py-1 font-black text-emerald-700 uppercase tracking-wide">
+                Available
+              </span>
+            ) : (
+              <span className="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center shadow-sm">
+                <Lock className="w-3.5 h-3.5" />
+              </span>
+            )}
+          </div>
+
+          <div
+            className={`flex justify-center my-1 ${
+              !isAvailable ? 'opacity-55 grayscale' : ''
+            }`}
+          >
+            <PetAvatar
+              type={type}
+              mood={isSelected ? 'happy' : 'idle'}
+              size="sm"
+            />
+          </div>
+
+          <div className="w-full pb-1">
+            <p className="font-['Outfit'] font-extrabold text-xs text-purple-950 truncate">
+              {pet.defaultName}
+            </p>
+
+            <p className="text-[10px] text-purple-600 font-medium truncate">
+              {pet.species}
+            </p>
+          </div>
+
+          {!isAvailable && (
+            <div className="mt-1 w-full rounded-lg bg-slate-800 text-white py-1 flex items-center justify-center gap-1">
+              <Lock className="w-3 h-3" />
+
+              <span className="text-[8px] font-black uppercase tracking-wider">
+                Coming Soon
               </span>
             </div>
-
-            <div className="mb-3 rounded-2xl bg-purple-50 border border-purple-200 px-4 py-3 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
-                <Lock className="w-4 h-4 text-purple-700" />
-              </div>
-              <div>
-                <p className="text-sm font-black text-purple-950">
-                  More pet adventures are coming soon!
-                </p>
-                <p className="text-xs font-medium text-purple-700 mt-0.5">
-                  Manchu the Dalmatian is the only available character in this version.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
-              {(Object.keys(PETS) as PetType[]).map((type) => {
-                const pet = PETS[type];
-                const isAvailable = type === 'dog';
-                const isSelected = selectedPet === type;
-
-                return (
-                  <button
-                    key={type}
-                    type="button"
-                    id={`welcome-select-pet-${type}`}
-                    disabled={!isAvailable}
-                    aria-disabled={!isAvailable}
-                    onClick={() => handlePetChange(type)}
-                    className={`relative p-2.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-between overflow-hidden ${
-                      isAvailable
-                        ? isSelected
-                          ? 'border-pink-500 bg-pink-50/95 shadow-md scale-104 ring-2 ring-pink-300 cursor-pointer'
-                          : 'border-gray-200 bg-white hover:bg-pink-50/40 hover:border-pink-200 cursor-pointer'
-                        : 'border-slate-200 bg-slate-50 cursor-not-allowed'
-                    }`}
-                  >
-                    {/* Availability indicator */}
-                    <div className="w-full flex justify-end">
-                      {isAvailable ? (
-                        <span className="text-[10px] bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 shadow-2xs font-black text-emerald-700 uppercase tracking-wide">
-                          Available
-                        </span>
-                      ) : (
-                        <span className="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center shadow-2xs">
-                          <Lock className="w-3.5 h-3.5" />
-                        </span>
-                      )}
-                    </div>
-
-                    <div className={`flex justify-center my-1 ${!isAvailable ? 'opacity-70 grayscale-[20%]' : ''}`}>
-                      <PetAvatar type={type} mood={isSelected ? 'happy' : 'idle'} size="sm" />
-                    </div>
-
-                    <div className="w-full">
-                      <p className="font-['Outfit'] font-extrabold text-xs text-purple-950 truncate">
-                        {pet.defaultName}
-                      </p>
-                      <p className="text-[10px] text-purple-600 font-medium truncate">
-                        {pet.species}
-                      </p>
-                    </div>
-
-                    {!isAvailable && (
-                      <div className="absolute inset-x-2 bottom-2 rounded-xl bg-slate-900/92 text-white py-1.5 px-2 flex items-center justify-center gap-1.5 shadow-md">
-                        <Lock className="w-3 h-3" />
-                        <span className="text-[9px] font-black uppercase tracking-wider">
-                          Coming Soon
-                        </span>
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
+          )}
+        </button>
+      );
+    })}
+  </div>
             {/* Elected Pet Spotlight Showcase - Big Cute Animated Face with Personality Actions */}
             <div className="mt-3.5 p-3.5 bg-gradient-to-tr from-pink-50/90 via-purple-50/80 to-sky-50/90 rounded-2xl border-2 border-pink-200 shadow-sm flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
               {/* Prominent Pet Face Avatar */}
@@ -490,17 +513,7 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
           </button>
         </form>
 
-        {/* 1-Click Demo Option for Hackathon Judges */}
-        <div className="mt-6 pt-4 border-t border-purple-100">
-          <button
-            id="welcome-judge-demo-new-btn"
-            onClick={onLaunchDemoMode}
-            className="inline-flex items-center space-x-1.5 text-xs font-bold text-purple-700 hover:text-purple-900 bg-purple-100/70 hover:bg-purple-100 px-3.5 py-1.5 rounded-full transition-all"
-          >
-            <Wand2 className="w-3.5 h-3.5 text-purple-600" />
-            <span>Hackathon Judge Demo Mode (1-Click Instant Emma Preset)</span>
-          </button>
-        </div>
+        
       </div>
     </div>
   );
