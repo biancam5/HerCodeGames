@@ -586,8 +586,8 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
       setHasWon(false);
       setShowGrace(false);
       setConfusedMessage(null);
-    } else {
-      onOpenCodePet('code-1');
+      } else {
+      onBackToHub();
     }
   };
 
@@ -833,11 +833,11 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
               </div>
               <div>
                 <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
-                  WHAT DOES IF MEAN?
-                </h3>
-                <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-                  <strong>if</strong> means: “Do this only when something is true.”
-                </p>
+              WHAT IS AN IF STATEMENT?
+            </h3>
+            <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+              An <strong>if statement</strong> checks a rule. If the rule is true, the computer does the action.
+            </p>
               </div>
             </div>
           </>
