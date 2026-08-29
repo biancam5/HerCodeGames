@@ -209,11 +209,11 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
           'You built a longer sequence! Each step in your sequence helped Manchu reach the ball and play.';
         logicDeepDive = `How your code worked: ${profile.pet.name} stepped forward 3 times with move() and then played with the tennis ball using play()!`;
       } else if (activeLevel.id === 'logic-3') {
-        conceptTitle = 'INPUT & OUTPUT UNLOCKED! 🎮';
-        conceptExplanation =
-          'An input is something you give the computer. An output is what the computer does in response.';
-        logicDeepDive = `You pressed SPACE — that was the input. ${profile.pet.name} jumped — that was the output!`;
-      } else if (activeLevel.id === 'logic-4') {
+  conceptTitle = 'VARIABLES & ALGORITHMS! 🧠';
+  conceptExplanation =
+    'A Variable is like a box that contains an object. An algorithm is a step-by-step plan used to solve a problem.';
+  logicDeepDive = `Your algorithm was: move(), jump(), move(). It helped ${profile.pet.name} get over the puddle and finish the path.`;
+} else if (activeLevel.id === 'logic-4') {
         conceptTitle = 'MAGIC LOOPS MASTERED! 🔁';
         conceptExplanation =
           'A loop tells the computer to repeat instructions without writing the same code over and over.';
@@ -502,8 +502,8 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
       ? `Computers run instructions in exact order. Help ${profile.pet.name} reach the steak before using eat().`
       : activeLevel.id === 'logic-2'
       ? `Think about the order: first reach the tennis ball, then use play().`
-      : activeLevel.id === 'logic-3'
-      ? `Look at the obstacle in the path. When walking is not enough, try a different input such as jump().`
+     : activeLevel.id === 'logic-3'
+      ? `There is an obstacle in the path. Build a step-by-step plan: walk, jump over the puddle, then keep moving.`
       : `Look at what happened in the game and try changing your next command.`;
 
   return (
@@ -640,42 +640,40 @@ export const PetLogicView: React.FC<PetLogicViewProps> = ({
               </div>
             </div>
           </>
-        ) : activeLevel.number === 3 ? (
-          <>
-            {/* Level 3 — Input */}
-            <div className="bg-white rounded-2xl p-3.5 border-2 border-purple-100 shadow-2xs flex items-start space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5">
-                <Terminal className="w-4 h-4 text-purple-600" />
-              </div>
+        ) ) : activeLevel.number === 3 ? (
+  <>
+    {/* Level 3 — Program */}
+    <div className="bg-white rounded-2xl p-3.5 border-2 border-purple-100 shadow-2xs flex items-start space-x-3">
+      <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0 mt-0.5">
+        <Terminal className="w-4 h-4 text-purple-600" />
+      </div>
 
-              <div>
-                <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
-                  WHAT IS AN INPUT?
-                </h3>
-                <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-                  An <strong>input</strong> is something you give a computer,
-                  like pressing a key.
-                </p>
-              </div>
-            </div>
+      <div>
+        <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
+          WHAT IS A VARIABLE?
+        </h3>
+        <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+          A <strong>Variable</strong> is a container used to store data values , like a box that contains important objects like books .
+        </p>
+      </div>
+    </div>
 
-            {/* Level 3 — Output */}
-            <div className="bg-white rounded-2xl p-3.5 border-2 border-pink-100 shadow-2xs flex items-start space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center shrink-0 mt-0.5">
-                <Sparkles className="w-4 h-4 text-pink-600" />
-              </div>
+    {/* Level 3 — Algorithm */}
+    <div className="bg-white rounded-2xl p-3.5 border-2 border-pink-100 shadow-2xs flex items-start space-x-3">
+      <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center shrink-0 mt-0.5">
+        <Sparkles className="w-4 h-4 text-pink-600" />
+      </div>
 
-              <div>
-                <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
-                  WHAT IS AN OUTPUT?
-                </h3>
-                <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
-                  An <strong>output</strong> is what the computer does after
-                  receiving an input.
-                </p>
-              </div>
-            </div>
-          </>
+      <div>
+        <h3 className="font-['Outfit'] font-black text-sm text-slate-900">
+          WHAT IS AN ALGORITHM?
+        </h3>
+        <p className="text-xs text-slate-600 font-medium mt-0.5 leading-relaxed">
+          An <strong>algorithm</strong> is a step-by-step plan to solve a problem.
+        </p>
+      </div>
+    </div>
+  </>
         ) : (
           <>
             {/* Level 1/default — Sequence */}
