@@ -164,7 +164,7 @@ export const PET_LOGIC_LEVELS: PetLogicLevel[] = [
   id: 'logic-3',
   number: 3,
   title: 'Jump Over the Puddle',
-  concept: 'Programs & Algorithms',
+  concept: 'Variables & Algorithms',
   conceptKey: 'ordering',
   story: "A big puddle is blocking the path! Help Manchu jump over it and keep moving forward.",
   goal: 'Jump over the puddle and reach the end of the path.',
@@ -236,87 +236,155 @@ export const PET_LOGIC_LEVELS: PetLogicLevel[] = [
   },
   explanationSuccess: {
     title: 'Mission Complete! 🎉',
-    body: 'You solved the problem with a step-by-step plan. That is how engineers think!',
-    conceptPill: 'Concept: Programs & Algorithms',
+    body: 'You used information and a step-by-step plan to solve the obstacle. Variables store information, while algorithms organize the steps needed to solve a problem.',
+    conceptPill: 'Concept: Variables & Algorithms',
   },
 },
   {
     id: 'logic-4',
     number: 4,
-    title: 'Star Berry Loop',
-    concept: 'Loops & Repetition',
-    conceptKey: 'loops',
-    story: 'There are 3 shiny star berries scattered along the garden path! Instead of saying "Collect, Collect, Collect", let’s use a loop to repeat the action 3 times.',
-    goal: 'Use REPEAT 3 TIMES ➔ COLLECT.',
+    title: 'Manchu’s Treat Hunt',
+    concept: 'Functions & Data Types',
+    conceptKey: 'functions',
+    story: 'Six crunchy dog biscuits are hidden around the garden! They appear one at a time in different places. Help Manchu move forward and backward to find every treat.',
+    goal: 'Find and collect all 6 dog biscuits.',
     initialPetState: {
-      hunger: 30,
-      energy: 90,
+      hunger: 45,
+      energy: 95,
       cleanliness: 90,
-      happiness: 50,
-      position: 0,
+      happiness: 70,
+      position: 2,
       starsCollected: 0,
     },
-    idealSequenceLength: 1,
+    idealSequenceLength: 14,
     availableCommands: [
-      { id: 'cmd-repeat-collect', type: 'REPEAT_3', label: 'REPEAT 3 TIMES: COLLECT', iconName: 'Repeat', color: 'bg-teal-100 text-teal-700 border-teal-200', description: 'Loop 3 times' },
-      { id: 'cmd-collect', type: 'COLLECT', label: 'COLLECT (1 time)', iconName: 'Star', color: 'bg-yellow-100 text-yellow-700 border-yellow-200', description: 'Single collect' },
-      { id: 'cmd-move', type: 'MOVE', label: 'MOVE', iconName: 'Footprints', color: 'bg-rose-100 text-rose-700 border-rose-200', description: 'Step forward' },
+      {
+        id: 'cmd-move',
+        type: 'MOVE',
+        label: 'move()',
+        iconName: 'Footprints',
+        color: 'bg-rose-100 text-rose-700 border-rose-200',
+        description: 'Move one space to the right',
+      },
+      {
+        id: 'cmd-collect',
+        type: 'COLLECT',
+        label: 'collectTreat()',
+        iconName: 'Cookie',
+        color: 'bg-amber-100 text-amber-800 border-amber-200',
+        description: 'Collect the treat when Manchu reaches it',
+      },
     ],
     targetPetStateGoal: (finalState, commands) => {
-      const usedLoop = commands.includes('REPEAT_3');
-      const allStars = finalState.starsCollected >= 3;
+      const allTreats = finalState.starsCollected >= 6;
+      const collectedTreat = commands.includes('COLLECT');
 
-      if (usedLoop && allStars) {
-        return { success: true, stars: 3, feedback: 'Awesome loop! You collected all 3 stars with just 1 smart repeat block.' };
+      if (allTreats && collectedTreat) {
+        const stars = commands.length <= 14 ? 3 : 2;
+        return {
+          success: true,
+          stars,
+          feedback: 'Amazing! Manchu found all 6 treats around the garden!',
+        };
       }
-      if (allStars && !usedLoop) {
-        return { success: false, stars: 1, feedback: 'You collected the stars, but programmers use loops to save typing! Try the REPEAT block.' };
+
+      if (!collectedTreat) {
+        return {
+          success: false,
+          stars: 0,
+          feedback: 'Move Manchu to the treat, then collect it with collectTreat().',
+        };
       }
-      return { success: false, stars: 0, feedback: 'Use the REPEAT 3 TIMES block to collect all 3 star berries!' };
+
+      return {
+        success: false,
+        stars: 0,
+        feedback: `Keep searching! Manchu has collected ${Math.min(finalState.starsCollected, 6)} of 6 treats.`,
+      };
     },
     explanationSuccess: {
-      title: 'Loops Mastered! 🔁',
-      body: 'Programmers use loops when they want to repeat instructions without writing the same code over and over again.',
-      conceptPill: 'Concept: Loops & Repetition',
+      title: 'Functions & Data Types! 🍪',
+      body: 'collectTreat() is a function: a named piece of code that performs a task. Programs also work with different data types, like different candy flavors: numbers, text, and true/false values.',
+      conceptPill: 'Concepts: Functions & Data Types',
     },
   },
   {
     id: 'logic-5',
     number: 5,
-    title: 'Garden Adventure Capstone',
-    concept: 'Combined Computational Thinking',
-    conceptKey: 'combined_logic',
-    story: 'Final Logic Quest! Guide your pet down the path: MOVE to the garden, REPEAT 3 to collect treats, check IF hungry to eat, and celebrate!',
-    goal: 'Combine Sequence, Loop, and Condition: MOVE ➔ REPEAT 3 COLLECT ➔ IF HUNGRY EAT.',
+    title: 'Manchu’s Smart Dinner',
+    concept: 'Conditions & if Statements',
+    conceptKey: 'conditions',
+    story: 'Manchu is back from his treat hunt. Now the program has to check how hungry he is before deciding whether he should eat dinner.',
+    goal: 'Use an if condition to check Manchu’s hunger and feed him only when he is hungry.',
+    foodBowlPosition: 3,
+    targetPosition: 3,
     initialPetState: {
-      hunger: 65,
-      energy: 85,
+      hunger: 75,
+      energy: 75,
       cleanliness: 80,
-      happiness: 60,
+      happiness: 80,
       position: 0,
       starsCollected: 0,
     },
-    idealSequenceLength: 3,
+    idealSequenceLength: 4,
     availableCommands: [
-      { id: 'cmd-move', type: 'MOVE', label: 'MOVE (Step forward)', iconName: 'Footprints', color: 'bg-rose-100 text-rose-700 border-rose-200', description: 'Step forward' },
-      { id: 'cmd-repeat-collect', type: 'REPEAT_3', label: 'REPEAT 3 TIMES: COLLECT', iconName: 'Repeat', color: 'bg-teal-100 text-teal-700 border-teal-200', description: 'Loop collect' },
-      { id: 'cmd-if-hungry', type: 'IF_HUNGRY', label: 'IF (Hunger > 50) ➔ EAT', iconName: 'HelpCircle', color: 'bg-purple-100 text-purple-700 border-purple-200', description: 'Smart eat' },
-      { id: 'cmd-play', type: 'PLAY', label: 'PLAY', iconName: 'Sparkles', color: 'bg-amber-100 text-amber-700 border-amber-200', description: 'Celebrate' },
+      {
+        id: 'cmd-move',
+        type: 'MOVE',
+        label: 'move()',
+        iconName: 'Footprints',
+        color: 'bg-rose-100 text-rose-700 border-rose-200',
+        description: 'Move toward the dinner bowl',
+      },
+      {
+        id: 'cmd-if-hungry',
+        type: 'IF_HUNGRY',
+        label: 'if (hunger > 50) { eat(); }',
+        iconName: 'HelpCircle',
+        color: 'bg-purple-100 text-purple-700 border-purple-200',
+        description: 'Check hunger before eating',
+      },
     ],
     targetPetStateGoal: (finalState, commands) => {
-      const moved = commands.includes('MOVE');
-      const looped = commands.includes('REPEAT_3');
-      const conditioned = commands.includes('IF_HUNGRY');
+      const reachedBowl = finalState.position >= 3;
+      const usedCondition = commands.includes('IF_HUNGRY');
+      const hungerLow = finalState.hunger <= 25;
 
-      if (moved && looped && conditioned && finalState.starsCollected >= 3 && finalState.hunger <= 25) {
-        return { success: true, stars: 3, feedback: 'Masterful! You combined sequence, loop, and condition perfectly!' };
+      if (reachedBowl && usedCondition && hungerLow) {
+        const stars = commands.length <= 4 ? 3 : 2;
+        return {
+          success: true,
+          stars,
+          feedback: 'Perfect! Your program checked Manchu’s hunger and made a smart decision.',
+        };
       }
-      return { success: false, stars: 0, feedback: 'Make sure to MOVE to the garden, use REPEAT 3 to collect, and check IF hungry to eat!' };
+
+      if (!reachedBowl) {
+        return {
+          success: false,
+          stars: 0,
+          feedback: 'First help Manchu reach his dinner bowl.',
+        };
+      }
+
+      if (!usedCondition) {
+        return {
+          success: false,
+          stars: 0,
+          feedback: 'This level needs a decision. Check Manchu’s hunger with an if condition before feeding him.',
+        };
+      }
+
+      return {
+        success: false,
+        stars: 0,
+        feedback: 'Check the condition and make sure Manchu eats only when hunger is greater than 50.',
+      };
     },
     explanationSuccess: {
-      title: 'Computational Thinking Complete! 🏆',
-      body: 'You have mastered the core logic of programming: Sequences, State, Conditions, and Loops! You are now ready to code in real JavaScript!',
-      conceptPill: 'Mastery: Computational Logic',
+      title: 'Smart Decisions with if! ⚡',
+      body: 'A condition is a rule the computer checks. An if statement runs an action only when that condition is true.',
+      conceptPill: 'Concepts: Condition & if',
     },
   },
 ];
