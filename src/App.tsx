@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { PlayerProfile, PetType } from './types';
 import {
   loadActiveProfile,
@@ -297,15 +297,16 @@ export default function App() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-pink-100 py-5 text-center text-xs text-purple-800">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
           <p className="font-medium text-slate-700">
             <strong className="font-black text-pink-600">HerCodeGames</strong> &bull; Girls just wanna have fun! Learn to code
           </p>
-          <div className="flex items-center space-x-3 text-[11px] font-semibold text-purple-700">
-            <span className="font-bold text-pink-600 bg-pink-50 px-2.5 py-1 rounded-full border border-pink-200">
-              Built by Bianca Mainella
-            </span>
-          </div>
+
+          <span className="hidden sm:inline text-pink-200 font-black">•</span>
+
+          <span className="font-bold text-pink-600 bg-pink-50 px-2.5 py-1 rounded-full border border-pink-200">
+            Built by Bianca Mainella
+          </span>
         </div>
       </footer>
     </div>
