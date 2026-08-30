@@ -196,14 +196,7 @@ export default function App() {
           {/* Right Action Menu */}
           <div className="flex items-center space-x-2">
             {!activeProfile && (
-              <button
-                id="nav-demo-mode-btn"
-                onClick={handleLaunchDemoMode}
-                className="py-1.5 px-3 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-900 text-xs font-bold flex items-center space-x-1 transition-all"
-              >
-                <Wand2 className="w-3.5 h-3.5 text-purple-600" />
-                <span className="hidden sm:inline">1-Click Demo</span>
-              </button>
+              
             )}
 
             {activeProfile && (
@@ -294,7 +287,6 @@ export default function App() {
           <TrajectoriesView onBackToHub={() => setCurrentView('hub')} />
         )}
       </main>
-
       {/* Footer */}
       <footer className="bg-white border-t border-pink-100 py-5 text-center text-xs text-purple-800">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
