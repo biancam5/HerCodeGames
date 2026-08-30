@@ -2,7 +2,7 @@
 
 ### Learn. Play. Code. 🚀
 
-**HerCodeGames** is an interactive coding game designed to introduce **girls aged 7–12** to programming and computer science in a fun, playful, and approachable way.
+**HerCodeGames** is an interactive coding game designed to introduce **girls aged 8–12** to programming and computer science in a fun, playful, and approachable way.
 
 Instead of starting with complex syntax or traditional lessons, players learn fundamental programming concepts by **playing, experimenting, solving challenges, and seeing the results of their decisions immediately.**
 
