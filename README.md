@@ -33,6 +33,22 @@ The bigger vision is to inspire more girls to continue exploring technology as t
 
 ---
 
+## 🎥 Demo
+
+### Play the game ! HERE 👏
+
+https://hercodegames.netlify.app/
+
+## Note : Currently  Pet logic game has 5 levels ! ( Still building this beautiful project. The main idea is to have many games and levels . If you want to contribute send me a message! )
+
+▶️ **Intro Demo Video**
+
+ https://drive.google.com/file/d/1a8u-r069KhBpj0uHRxCmaITOtI7ywLgJ/view
+
+ 
+
+---
+
 ## 🎮 How It Works
 
 HerCodeGames transforms programming concepts into interactive challenges.
@@ -83,24 +99,7 @@ Programming concepts are introduced through gameplay instead of traditional less
 
 Every challenge encourages logical thinking, sequencing, experimentation, and problem solving.
 
----
-
-## 🎥 Demo
-
-### Play the game ! HERE 👏
-
-https://hercodegames.netlify.app/
-
-## Note : Currently  Pet logic game has 5 levels ! ( Still building this beautiful project. The main idea is to have many games and levels . If you want to contribute send me a message! )
-
-▶️ **Demo Video**
-
-*Coming soon — gameplay walkthrough will be added after deployment.*
-
-<!-- Replace this section with your demo video link or thumbnail -->
-
----
-
+ 
 ## 💡 Why I Built HerCodeGames
 
 Technology shapes almost every part of our world, yet women remain underrepresented in many areas of the tech industry.
@@ -113,7 +112,7 @@ It starts when a young girl discovers that she can understand technology, create
 
 That's why I created HerCodeGames.
 
-I wanted to build an experience where a **8-year-old doesn't need to know what a variable, function, or algorithm is to start thinking like a programmer.**
+I wanted to build an experience where a **8-year-old doesn't need to know what a variable, function, or algorithm is to start thinking like an engineer.**
 
 She just needs to play.
 
