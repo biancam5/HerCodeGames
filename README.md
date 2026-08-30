@@ -33,13 +33,12 @@ The bigger vision is to inspire more girls to continue exploring technology as t
 
 ---
 
-## 🎥 Demo
+## 🎥 Demo 💜
 
-### Play the game ! HERE 👏
+### Play the game ! HERE 👏 🚀 
 
 https://hercodegames.netlify.app/
 
-## Note : Currently  Pet logic game has 5 levels ! ( Still building this beautiful project. The main idea is to have many games and levels . If you want to contribute send me a message! )
 
 ▶️ **Intro Demo Video**
 
