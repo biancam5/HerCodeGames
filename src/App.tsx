@@ -192,24 +192,19 @@ export default function App() {
               </div>
             </div>
           )}
-
-          {/* Right Action Menu */}
-          <div className="flex items-center space-x-2">
-            {!activeProfile && (
-              
-            )}
-
-            {activeProfile && (
-              <button
-                id="nav-reset-profile-btn"
-                onClick={handleResetData}
-                title="Reset or Switch Player"
-                className="p-2 rounded-xl text-purple-400 hover:text-purple-700 hover:bg-purple-50 transition-colors"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+             {/* Right Action Menu */}
+     <div className="flex items-center space-x-2">
+       {activeProfile && (
+         <button
+           id="nav-reset-profile-btn"
+           onClick={handleResetData}
+           title="Reset or Switch Player"
+           className="p-2 rounded-xl text-purple-400 hover:text-purple-700 hover:bg-purple-50 transition-colors"
+         >
+           <RotateCcw className="w-4 h-4" />
+         </button>
+       )}
+     </div>
         </div>
       </header>
 
