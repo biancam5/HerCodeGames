@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+ import React, { useState, useRef } from 'react';
 import { PetType, PlayerProfile } from '../../types';
 import { PETS } from '../../data/levels';
 import { PetAvatar } from '../pet/PetAvatar';
@@ -9,7 +9,6 @@ import {
   Compass,
   Users,
   Check,
-  Wand2,
   AlertCircle,
   Lock,
 } from 'lucide-react';
@@ -21,7 +20,6 @@ interface WelcomeViewProps {
   onContinue: () => void;
   onChooseLevel: () => void;
   onSelectProfile: (id: string) => void;
-  onLaunchDemoMode: () => void;
 }
 
 export const WelcomeView: React.FC<WelcomeViewProps> = ({
@@ -31,7 +29,6 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
   onContinue,
   onChooseLevel,
   onSelectProfile,
-  onLaunchDemoMode,
 }) => {
   const [selectedPet, setSelectedPet] = useState<PetType>('dog');
   const [selectedPetMood, setSelectedPetMood] = useState<'happy' | 'eating' | 'sleeping' | 'playing'>('eating');
@@ -99,10 +96,10 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
 
     // MVP safety guard: only Manchu is playable in this version.
     if (selectedPet !== 'dog') {
-    setSelectedPet('dog');
-    setPetCustomName(PETS['dog'].defaultName);
-    return;
-  }
+      setSelectedPet('dog');
+      setPetCustomName(PETS['dog'].defaultName);
+      return;
+    }
 
     onStartAdventure(playerName.trim(), selectedPet, petCustomName.trim());
   };
@@ -182,62 +179,71 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({
           </div>
 
 
-        {/* Switch Player Modal */}
-        {showSwitchModal && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-purple-100">
-              <h3 className="font-['Outfit'] font-bold text-xl text-purple-950 mb-2">Switch Player Profile</h3>
-              <p className="text-xs text-purple-700 mb-4">Select a saved player or create a new explorer.</p>
+          {/* Switch Player Modal */}
+          {showSwitchModal && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+              <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-purple-100">
+                <h3 className="font-['Outfit'] font-bold text-xl text-purple-950 mb-2">
+                  Switch Player Profile
+                </h3>
+                <p className="text-xs text-purple-700 mb-4">
+                  Select a saved player or create a new explorer.
+                </p>
 
-              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                {allProfiles.map((p) => (
-                  <div
-                    key={p.id}
-                    onClick={() => {
-                      onSelectProfile(p.id);
-                      setShowSwitchModal(false);
-                    }}
-                    className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
-                      p.id === existingProfile.id
-                        ? 'bg-pink-50 border-pink-300'
-                        : 'bg-white hover:bg-purple-50 border-gray-100'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <PetAvatar type={p.pet.type} mood="idle" size="sm" />
-                      <div>
-                        <p className="font-bold text-sm text-purple-950">{p.name}</p>
-                        <p className="text-[11px] text-purple-600">
-                          {p.pet.name} &bull; ⭐ {p.stars} stars
-                        </p>
+                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                  {allProfiles.map((p) => (
+                    <div
+                      key={p.id}
+                      onClick={() => {
+                        onSelectProfile(p.id);
+                        setShowSwitchModal(false);
+                      }}
+                      className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                        p.id === existingProfile.id
+                          ? 'bg-pink-50 border-pink-300'
+                          : 'bg-white hover:bg-purple-50 border-gray-100'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <PetAvatar type={p.pet.type} mood="idle" size="sm" />
+                        <div>
+                          <p className="font-bold text-sm text-purple-950">{p.name}</p>
+                          <p className="text-[11px] text-purple-600">
+                            {p.pet.name} &bull; ⭐ {p.stars} stars
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    {p.id === existingProfile.id && <Check className="w-5 h-5 text-pink-600" />}
-                  </div>
-                ))}
-              </div>
 
-              <div className="mt-4 flex space-x-2">
-                <button
-                  id="welcome-create-new-profile-btn"
-                  onClick={() => {
-                    setShowSwitchModal(false);
-                    setIsCreatingNew(true);
-                  }}
-                  className="flex-1 py-2.5 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold rounded-xl shadow-xs"
-                >
-                  + Create New Player
-                </button>
-                <button
-                  onClick={() => setShowSwitchModal(false)}
-                  className="py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl"
-                >
-                  Close
-                </button>
+                      {p.id === existingProfile.id && (
+                        <Check className="w-5 h-5 text-pink-600" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex space-x-2">
+                  <button
+                    id="welcome-create-new-profile-btn"
+                    onClick={() => {
+                      setShowSwitchModal(false);
+                      setIsCreatingNew(true);
+                    }}
+                    className="flex-1 py-2.5 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold rounded-xl shadow-xs"
+                  >
+                    + Create New Player
+                  </button>
+
+                  <button
+                    onClick={() => setShowSwitchModal(false)}
+                    className="py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   }
